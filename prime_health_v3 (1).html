@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Bilan de Santé — Prime Health Clinic</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:#F0F2F7}
+
+/* ── PHONE SHELL : position:fixed = jamais caché par Safari ── */
+.phone{
+  position:fixed;
+  /* safe-area : notch en haut, barre Safari/home en bas */
+  top:env(safe-area-inset-top,0px);
+  left:0;right:0;
+  bottom:env(safe-area-inset-bottom,0px);
+  background:#fff;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+/* Desktop : carte centrée */
+@media(min-width:520px){
+  body{display:flex;align-items:center;justify-content:center;overflow:auto;height:auto;min-height:100vh;padding:24px 0}
+  .phone{
+    position:relative;
+    top:auto;left:auto;right:auto;bottom:auto;
+    width:390px;
+    height:min(720px,calc(100vh - 48px));
+    border-radius:40px;
+    box-shadow:0 24px 64px rgba(0,0,0,.14),0 4px 18px rgba(0,0,0,.08);
+  }
+}
+
+/* ── SCREENS ── */
+.screen{
+  position:absolute;inset:0;
+  display:none;flex-direction:column;overflow:hidden;
+}
+.screen.active{display:flex}
+
+/* ══ LANDING ══ */
+#s-land{background:#fff;justify-content:space-between;align-items:center}
+.land-bg{
+  width:100%;height:clamp(150px,32dvh,230px);
+  background:#F0F2F7;border-radius:0 0 50% 50%;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;flex-shrink:0;
+}
+.land-bg::before{content:'';position:absolute;width:clamp(120px,44vw,170px);height:clamp(120px,44vw,170px);background:rgba(255,255,255,.5);border-radius:50%;top:16px}
+.brain-svg{width:clamp(70px,21vw,98px);height:clamp(70px,21vw,98px);position:relative;z-index:1}
+.land-content{
+  flex:1;min-height:0;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;justify-content:center;
+  padding:12px 28px;
+}
+.land-title{font-size:clamp(18px,5.5vw,25px);font-weight:800;color:#1C1C2E;line-height:1.25;margin-bottom:10px}
+.land-desc{font-size:clamp(12px,3.4vw,14px);color:#8A8FA8;line-height:1.65;margin-bottom:3px}
+.land-dur{font-size:clamp(12px,3.4vw,14px);color:#8A8FA8;margin-bottom:clamp(16px,2.8dvh,26px)}
+.btn-cta{
+  background:#3D7D5A;color:#fff;border:none;border-radius:50px;
+  padding:clamp(11px,1.8dvh,14px) 36px;
+  font-family:'Nunito',sans-serif;font-size:clamp(13px,3.8vw,15px);font-weight:700;
+  cursor:pointer;width:100%;max-width:260px;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+.btn-cta:active{background:#2D6045;transform:scale(.98)}
+.land-brand{display:flex;align-items:center;gap:6px;color:#8A8FA8;font-size:12px;font-weight:600;padding-bottom:8px;flex-shrink:0}
+.blogo{width:20px;height:20px;border-radius:50%;background:#3D7D5A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.blogo svg{width:11px;height:11px}
+
+/* ══ QUIZ ══ */
+#s-quiz{background:#F0F2F7}
+.quiz-top{background:#fff;padding:13px 18px 10px;flex-shrink:0}
+.axe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.axe-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.q-cnt{font-size:11px;color:#8A8FA8;font-weight:600}
+.pbar{height:4px;background:#E8EAF0;border-radius:2px;overflow:hidden}
+.pfill{height:100%;border-radius:2px;transition:width .4s}
+.quiz-card{
+  background:#fff;margin:10px 12px 0;border-radius:26px;
+  padding:15px 16px 12px;
+  flex:1;min-height:0;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  animation:fadeUp .22s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.axe-icon-c{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;margin:0 auto 10px}
+.q-nm{text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.q-tx{text-align:center;font-size:clamp(13.5px,4vw,16px);font-weight:700;color:#1C1C2E;line-height:1.35;margin-bottom:4px}
+.q-sb{text-align:center;font-size:10.5px;color:#8A8FA8;line-height:1.5;margin-bottom:13px}
+.ans-list{display:flex;flex-direction:column;gap:7px}
+.ans-pill{border:1.5px solid #E8EAF0;border-radius:13px;padding:11px 14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:clamp(12.5px,3.7vw,14.5px);color:#1C1C2E;font-weight:600;background:#fff;text-align:left;transition:all .15s;width:100%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.ans-pill.sel-0{background:#FDEAEA;border-color:#F09595;color:#791F1F}
+.ans-pill.sel-1{background:#FEF3E0;border-color:#FAC775;color:#633806}
+.ans-pill.sel-2{background:#E8F4EF;border-color:#5DCAA5;color:#085041}
+.ans-pill.sel-3{background:#EEF0FE;border-color:#AFA9EC;color:#3C3489}
+/* Footer quiz : TOUJOURS collé en bas, jamais caché */
+.quiz-footer{flex-shrink:0;background:transparent;padding:5px 12px 10px}
+.axe-sc-mini{text-align:center;font-size:10.5px;color:#8A8FA8;padding:4px 0 4px;font-weight:600}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center}
+.btn-prev{background:#fff;border:1.5px solid #E8EAF0;border-radius:50px;padding:9px 18px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;color:#8A8FA8;cursor:pointer;touch-action:manipulation}
+.btn-nxt{border:none;border-radius:50px;padding:9px 22px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;opacity:.35;pointer-events:none;touch-action:manipulation}
+.btn-nxt.ok{opacity:1;pointer-events:all}
+
+/* ══ ANALYSE ══ */
+#s-analyse{background:#F0F2F7}
+.an-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 24px}
+.spin{width:54px;height:54px;border:3px solid #E8EAF0;border-top:3px solid #3D7D5A;border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.an-title{font-size:18px;font-weight:700;color:#1C1C2E;margin-bottom:5px}
+.an-sb{font-size:12px;color:#8A8FA8;margin-bottom:18px}
+.an-steps{display:flex;flex-direction:column;gap:7px;width:100%}
+.an-step{display:flex;align-items:center;gap:9px;background:#fff;border-radius:13px;padding:9px 13px;font-size:12px;color:#8A8FA8;font-weight:600;transition:all .3s}
+.an-step.done{color:#3D7D5A}
+.an-dot{width:18px;height:18px;border-radius:50%;border:2px solid #E8EAF0;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;transition:all .3s}
+.an-step.done .an-dot{background:#3D7D5A;border-color:#3D7D5A;color:#fff}
+
+/* ══ RESULTS ══ */
+#s-results{background:#F0F2F7}
+.res-top{background:#fff;padding:13px 18px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.res-logo-sm{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:#3D7D5A}
+.btn-redo{background:#F0F2F7;border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:#8A8FA8;cursor:pointer;touch-action:manipulation}
+.slides-viewport{flex:1;min-height:0;overflow:hidden;position:relative}
+.slides-track{display:flex;height:100%;transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.slide{min-width:100%;height:100%;overflow-y:auto;padding:10px 12px 8px;-webkit-overflow-scrolling:touch}
+.slide-nav{flex-shrink:0;background:#fff;padding:9px 18px 11px;display:flex;align-items:center;justify-content:space-between;border-top:.5px solid #F0F2F7}
+.btn-slide{border:none;border-radius:50px;padding:9px 18px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.btn-slide.prev{background:#F0F2F7;color:#8A8FA8}
+.btn-slide.next{background:#3D7D5A;color:#fff}
+.btn-slide:disabled{opacity:.3;pointer-events:none}
+.dots{display:flex;gap:5px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:#E8EAF0;transition:all .2s;cursor:pointer;touch-action:manipulation}
+.dot.active{background:#3D7D5A;width:20px;border-radius:4px}
+/* Cards */
+.rcard{background:#fff;border-radius:20px;padding:13px 13px;margin-bottom:9px}
+.rcard:last-child{margin-bottom:0}
+.rcard-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:9px;display:flex;align-items:center;gap:4px}
+.profile-box{border-radius:14px;padding:12px}
+.profile-box.combined{background:#FDEAEA}
+.profile-box.isole{background:#FEF3E0}
+.profile-box.homogene{background:#E8F4EF}
+.pb-badge{font-size:14px;font-weight:800;margin-bottom:2px}
+.pb-sub{font-size:10.5px;font-weight:600;opacity:.7;margin-bottom:7px}
+.pb-desc{font-size:11.5px;line-height:1.6;margin-bottom:9px;opacity:.85}
+.pb-checks{display:flex;flex-direction:column;gap:4px;margin-bottom:9px}
+.pb-check{font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:5px}
+.chk{width:15px;height:15px;border-radius:50%;background:rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;font-weight:700}
+.pb-zone{border-radius:9px;padding:7px 9px;font-size:11px;font-weight:700}
+.combined .pb-zone{background:#E24B4A;color:#fff}
+.isole .pb-zone{background:#BA7517;color:#fff}
+.homogene .pb-zone{background:#3D7D5A;color:#fff}
+.radar-wrap{display:flex;justify-content:center;margin-bottom:6px}
+.total-row{background:#E8F4EF;border-radius:11px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;margin-top:7px}
+.total-lbl{font-size:11.5px;color:#3D7D5A;font-weight:700}
+.total-num{font-size:15px;font-weight:800;color:#3D7D5A}
+.sdr{display:flex;align-items:center;gap:6px;margin-bottom:9px;padding-bottom:9px;border-bottom:.5px solid #F0F2F7}
+.sdr:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sdr-ic{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sdr-info{flex:1}
+.sdr-nm{font-size:11px;font-weight:700;color:#1C1C2E;margin-bottom:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sdr-bar{height:6px;background:#F0F2F7;border-radius:3px;overflow:hidden;margin-bottom:2px}
+.sdr-fill{height:100%;border-radius:3px}
+.sdr-meta{font-size:9.5px;color:#8A8FA8;font-weight:600}
+.sdr-sc{font-size:13px;font-weight:800;min-width:34px;text-align:right;flex-shrink:0}
+.lvl-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px}
+.lvl-faible{background:#E8F4EF;color:#085041}
+.lvl-moyen{background:#FEF3E0;color:#633806}
+.lvl-eleve{background:#FDEAEA;color:#791F1F}
+.leg-item{display:flex;align-items:center;gap:3px;font-size:10px;color:#8A8FA8;font-weight:600}
+.leg-dot{width:7px;height:7px;border-radius:50%}
+.rec-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:.5px solid #F0F2F7;font-size:clamp(11.5px,3.4vw,13px);color:#4A4A6A;line-height:1.5}
+.rec-item:last-child{border-bottom:none}
+.rec-ic{width:28px;height:28px;border-radius:9px;background:#E8F4EF;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.interp-txt{font-size:clamp(11.5px,3.4vw,13px);color:#4A4A6A;line-height:1.75}
+.interp-txt strong{color:#1C1C2E;font-weight:700}
+.email-block{background:#fff;border-radius:20px;padding:13px}
+.email-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.email-row{display:flex;gap:7px;align-items:center;margin-bottom:6px}
+.email-in{flex:1;border:1.5px solid #E8EAF0;border-radius:13px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:14px;color:#1C1C2E;background:#F8F9FC;outline:none;transition:border .2s}
+.email-in:focus{border-color:#3D7D5A;background:#fff}
+.email-in::placeholder{color:#B0B4C8}
+.btn-send{background:#3D7D5A;color:#fff;border:none;border-radius:13px;padding:10px 13px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;touch-action:manipulation}
+.email-note{font-size:10px;color:#B0B4C8;text-align:center;line-height:1.5}
+.email-ok{display:none;background:#E8F4EF;border-radius:11px;padding:9px;font-size:12px;color:#3D7D5A;font-weight:700;text-align:center;margin-bottom:6px}
+.pdf-btn-wrap{padding:8px 0 2px}
+.pdf-btn{width:100%;background:#1C1C2E;color:#fff;border:none;border-radius:50px;padding:13px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pdf-btn:active{background:#2D2D4A}
+/* ── PRODUCT CARD ── */
+.prod-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.05);margin-bottom:9px}
+.prod-header{padding:14px 14px 10px;display:flex;align-items:flex-start;gap:10px}
+.prod-emoji-wrap{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.prod-meta{flex:1;min-width:0}
+.prod-cat{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.75;margin-bottom:2px}
+.prod-name{font-size:13.5px;font-weight:800;color:#1C1C2E;line-height:1.2}
+.prod-pack-badge{display:inline-flex;align-items:center;gap:3px;background:#1C1C2E;color:#fff;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.prod-headline{font-size:12px;font-weight:700;line-height:1.45;padding:0 14px 10px}
+.prod-divider{height:1px;background:#F0F2F7;margin:0 14px}
+.prod-benefits{padding:10px 14px}
+.prod-benefit{display:flex;align-items:flex-start;gap:7px;font-size:11.5px;color:#4A4A6A;line-height:1.45;margin-bottom:6px}
+.prod-benefit:last-child{margin-bottom:0}
+.prod-check{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px}
+.prod-ingredients{padding:0 14px 10px;font-size:10px;color:#A0A8B8;font-weight:500;line-height:1.4}
+.prod-ingredients strong{color:#8A8FA8;font-weight:600}
+.prod-cta{padding:0 14px 14px}
+.prod-cta-btn{width:100%;border:none;border-radius:50px;padding:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:filter .15s}
+.prod-cta-btn:active{filter:brightness(.9)}
+.pdf-overlay{display:none;position:absolute;inset:0;background:rgba(28,28,46,.78);border-radius:inherit;z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.pdf-overlay.active{display:flex}
+.pdf-spin{width:44px;height:44px;border:3px solid rgba(255,255,255,.2);border-top:3px solid #7FD9A8;border-radius:50%;animation:spin .9s linear infinite}
+.pdf-msg{color:#fff;font-size:14px;font-weight:700;text-align:center;padding:0 24px;line-height:1.5}
+<!-- ══ MODULE 2 : CHECK QUOTIDIEN ══ -->
+<div id="s-check" style="display:none; padding:20px; font-family:sans-serif;">
+  <h2>🧠 Comment vous sentez-vous aujourd'hui ?</h2>
+  <p id="check-date" style="color:gray; font-size:13px;"></p>
+
+  <div id="check-axes">
+    <!-- Axe Énergie -->
+    <div class="axe-block">
+      <label>🔋 Énergie</label>
+      <div class="btn-group" data-axe="energie">
+        <button onclick="selectScore('energie',1,this)">1</button>
+        <button onclick="selectScore('energie',2,this)">2</button>
+        <button onclick="selectScore('energie',3,this)">3</button>
+        <button onclick="selectScore('energie',4,this)">4</button>
+        <button onclick="selectScore('energie',5,this)">5</button>
+      </div>
+    </div>
+
+    <!-- Axe Stress -->
+    <div class="axe-block">
+      <label>🧠 Stress</label>
+      <div class="btn-group" data-axe="stress">
+        <button onclick="selectScore('stress',1,this)">1</button>
+        <button onclick="selectScore('stress',2,this)">2</button>
+        <button onclick="selectScore('stress',3,this)">3</button>
+        <button onclick="selectScore('stress',4,this)">4</button>
+        <button onclick="selectScore('stress',5,this)">5</button>
+      </div>
+    </div>
+
+    <!-- Axe Digestion -->
+    <div class="axe-block">
+      <label>🫁 Digestion</label>
+      <div class="btn-group" data-axe="digestion">
+        <button onclick="selectScore('digestion',1,this)">1</button>
+        <button onclick="selectScore('digestion',2,this)">2</button>
+        <button onclick="selectScore('digestion',3,this)">3</button>
+        <button onclick="selectScore('digestion',4,this)">4</button>
+        <button onclick="selectScore('digestion',5,this)">5</button>
+      </div>
+    </div>
+
+    <!-- Axe Sommeil -->
+    <div class="axe-block">
+      <label>😴 Sommeil</label>
+      <div class="btn-group" data-axe="sommeil">
+        <button onclick="selectScore('sommeil',1,this)">1</button>
+        <button onclick="selectScore('sommeil',2,this)">2</button>
+        <button onclick="selectScore('sommeil',3,this)">3</button>
+        <button onclick="selectScore('sommeil',4,this)">4</button>
+        <button onclick="selectScore('sommeil',5,this)">5</button>
+      </div>
+    </div>
+
+    <!-- Axe Humeur -->
+    <div class="axe-block">
+      <label>💚 Humeur</label>
+      <div class="btn-group" data-axe="humeur">
+        <button onclick="selectScore('humeur',1,this)">1</button>
+        <button onclick="selectScore('humeur',2,this)">2</button>
+        <button onclick="selectScore('humeur',3,this)">3</button>
+        <button onclick="selectScore('humeur',4,this)">4</button>
+        <button onclick="selectScore('humeur',5,this)">5</button>
+      </div>
+    </div>
+  </div>
+
+  <button
+    id="btn-valider-check"
+    onclick="validerCheck()"
+    disabled
+    style="margin-top:20px; padding:12px 24px; background:#3D7D5A;
+           color:#fff; border:none; border-radius:50px;
+           font-size:15px; cursor:pointer; opacity:0.4;">
+    Valider mon check
+  </button>
+</div>
+<!-- ══ MODULE 7 : DASHBOARD ══ -->
+<div id="s-dashboard" style="display:none; padding:20px; font-family:sans-serif;">
+
+  <h2 id="dash-greeting">Bonjour 👋</h2>
+  <p id="dash-date" style="color:gray; font-size:13px;"></p>
+
+  <!-- Score du jour -->
+  <div style="background:#f5f5f5; border-radius:16px; padding:16px; margin:16px 0; text-align:center;">
+    <div style="font-size:13px; color:gray; margin-bottom:4px;">Score santé aujourd'hui</div>
+    <div id="dash-score" style="font-size:52px; font-weight:900; color:#1C1C2E;">—</div>
+    <div style="font-size:13px; color:gray;">/ 100</div>
+    <div id="dash-delta" style="font-size:13px; font-weight:700; margin-top:6px;"></div>
+  </div>
+
+  <!-- Bouton check -->
+  <button
+    onclick="afficherCheck()"
+    style="width:100%; padding:14px; background:#3D7D5A; color:#fff;
+           border:none; border-radius:50px; font-size:15px;
+           font-weight:700; cursor:pointer; margin-bottom:12px;">
+    ⚡ Faire mon check aujourd'hui
+  </button>
+
+  <!-- Bouton progression -->
+  <button
+    onclick="afficherProgression()"
+    style="width:100%; padding:12px; background:#f0f0f0; color:#333;
+           border:none; border-radius:50px; font-size:14px;
+           font-weight:600; cursor:pointer; margin-bottom:12px;">
+    📈 Voir ma progression
+  </button>
+
+  <!-- Bouton refaire bilan -->
+  <button
+    onclick="refaireBilan()"
+    style="width:100%; padding:12px; background:#f0f0f0; color:#333;
+           border:none; border-radius:50px; font-size:14px;
+           font-weight:600; cursor:pointer;">
+    🔄 Refaire mon bilan
+  </button>
+
+  <!-- Objectif -->
+  <div style="margin-top:20px; background:#eef7f2; border-radius:14px; padding:14px;">
+    <div style="font-size:11px; font-weight:700; color:#3D7D5A;
+                text-transform:uppercase; margin-bottom:6px;">
+      🎯 Objectif prioritaire
+    </div>
+    <div id="dash-objectif" style="font-size:13px; color:#333; line-height:1.6;">
+      —
+    </div>
+  </div>
+
+  <!-- Feedback intelligent -->
+  <div id="dash-feedback"
+    style="margin-top:12px; border-radius:14px; padding:14px;
+           font-size:13px; font-weight:600; display:none;">
+  </div>
+
+</div>
+/* ══ SUIVI SYSTEM CSS V2 ══ */
+.suivi-header{background:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:.5px solid #F0F2F7}
+.suivi-back{background:none;border:none;font-size:20px;color:#3D7D5A;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.suivi-header-title{font-size:13px;font-weight:700;color:#1C1C2E}
+.suivi-scroll{flex:1;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:9px}
+.suivi-entry-pills{display:flex;flex-direction:column;gap:8px}
+.suivi-entry-pill{background:#fff;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);border:1px solid #F0F2F7}
+.suivi-entry-pill span{font-size:22px;flex-shrink:0;width:40px;height:40px;background:#F0F2F7;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.suivi-entry-pill div strong{font-size:13px;color:#1C1C2E;display:block;margin-bottom:1px}
+.suivi-entry-pill div p{font-size:11px;color:#8A8FA8;margin:0}
+.btn-suivi-start{width:100%;background:#3D7D5A;color:#fff;border:none;border-radius:50px;padding:14px;font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;touch-action:manipulation;transition:all .15s;-webkit-tap-highlight-color:transparent;letter-spacing:.01em}
+.btn-suivi-start:active{background:#2D6045;transform:scale(.98)}
+.btn-suivi-secondary{background:#F0F2F7;color:#4A4A6A;border:none;border-radius:50px;padding:11px 16px;font-family:'Nunito',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;touch-action:manipulation}
+.suivi-pwa-block{background:#F8F9FC;border-radius:14px;padding:12px 14px;text-align:center;border:1px dashed #D8DAE8}
+
+/* ── Check: nom d'utilisateur ── */
+.name-input-wrap{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.name-input{width:100%;border:1.5px solid #E8EAF0;border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#1C1C2E;background:#F8F9FC;outline:none;transition:border .2s}
+.name-input:focus{border-color:#3D7D5A;background:#fff}
+
+/* ── Check axes V2 : slider ── */
+.check-axes{display:flex;flex-direction:column;gap:8px}
+.check-axe-row{background:#fff;border-radius:18px;padding:13px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05);animation:fadeUp .2s ease both}
+.check-axe-row:nth-child(1){animation-delay:.03s}
+.check-axe-row:nth-child(2){animation-delay:.07s}
+.check-axe-row:nth-child(3){animation-delay:.11s}
+.check-axe-row:nth-child(4){animation-delay:.15s}
+.check-axe-row:nth-child(5){animation-delay:.19s}
+.check-axe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.check-axe-label{font-size:12.5px;font-weight:700;color:#1C1C2E;display:flex;align-items:center;gap:7px}
+.check-axe-val-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#F0F2F7;color:#8A8FA8;transition:all .2s}
+.check-btns{display:flex;gap:5px}
+.check-btn{flex:1;border:2px solid #E8EAF0;border-radius:12px;padding:10px 2px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:600;color:#8A8FA8;background:#F8F9FC;cursor:pointer;transition:all .18s;touch-action:manipulation;text-align:center;-webkit-tap-highlight-color:transparent;line-height:1}
+.check-btn:active{transform:scale(.93)}
+.check-btn.active{border-width:2px;transform:scale(1.05);box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.check-btn[data-v="1"].active{color:#4CAF78;background:#E8F4EF;border-color:#4CAF78}
+.check-btn[data-v="2"].active{color:#8BC4A8;background:#EEF7F2;border-color:#8BC4A8}
+.check-btn[data-v="3"].active{color:#C07C1A;background:#FEF3E0;border-color:#C07C1A}
+.check-btn[data-v="4"].active{color:#E8680A;background:#FEF0E6;border-color:#E8680A}
+.check-btn[data-v="5"].active{color:#C13030;background:#FDEAEA;border-color:#C13030}
+
+/* Progress bar on check */
+.check-progress-bar{height:3px;background:#E8EAF0;border-radius:2px;overflow:hidden;flex-shrink:0}
+.check-progress-fill{height:100%;background:#3D7D5A;border-radius:2px;transition:width .3s}
+
+/* Score screen V2 */
+.score-circle-wrap{display:flex;justify-content:center;align-items:center;position:relative;height:170px;flex-shrink:0}
+.score-circle-inner{position:absolute;text-align:center}
+.score-big{font-size:44px;font-weight:800;color:#1C1C2E;line-height:1}
+.score-sub{font-size:13px;color:#8A8FA8;font-weight:600}
+.score-delta{text-align:center;font-size:13px;font-weight:700;margin:-4px 0 4px}
+.score-feedback-box{border-radius:16px;padding:13px 14px;font-size:12.5px;line-height:1.7;font-weight:600}
+.score-axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.score-axis-card{background:#fff;border-radius:14px;padding:11px 12px;box-shadow:0 2px 8px rgba(0,0,0,.07);position:relative;overflow:hidden}
+.score-axis-bar-bg{position:absolute;bottom:0;left:0;right:0;height:3px;background:#F0F2F7}
+.score-axis-bar-fill{position:absolute;bottom:0;left:0;height:3px;border-radius:0 3px 0 0;transition:width .6s ease}
+.score-axis-name{font-size:10px;color:#8A8FA8;font-weight:600;margin-bottom:3px}
+.score-axis-val{font-size:18px;font-weight:800;color:#1C1C2E}
+.score-axis-trend{font-size:10.5px;font-weight:600;margin-top:1px}
+
+/* Dashboard V2 */
+.dash-header{background:linear-gradient(135deg,#3D7D5A 0%,#2D6045 100%);padding:16px 18px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dash-greeting{font-size:16px;font-weight:800;color:#fff}
+.dash-date{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
+.dash-score-card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1.5px solid transparent;transition:border-color .3s}
+.dash-score-big{font-size:50px;font-weight:900;color:#1C1C2E;line-height:1}
+.dash-score-delta{font-size:12px;font-weight:600;margin-top:4px}
+.dash-actions{display:flex;flex-direction:column;gap:8px}
+.dash-action-primary{background:#3D7D5A;color:#fff;border:none;border-radius:16px;padding:14px 16px;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;touch-action:manipulation;transition:filter .15s}
+.dash-action-primary:active{filter:brightness(.9)}
+.dash-action-secondary{background:#fff;color:#4A4A6A;border:none;border-radius:14px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.07);touch-action:manipulation;transition:filter .15s}
+.dash-action-secondary:active{filter:brightness(.95)}
+/* Streak badge */
+.streak-badge{display:inline-flex;align-items:center;gap:5px;background:#FEF3E0;color:#C07C1A;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
+/* Mini sparkline */
+.dash-sparkline{height:36px;margin:8px 0 4px}
+/* Check already done badge */
+.done-today-badge{display:flex;align-items:center;gap:8px;background:#E8F4EF;border-radius:12px;padding:10px 13px;font-size:12px;font-weight:700;color:#3D7D5A;margin-bottom:2px}
+
+/* Prog chart V2 */
+#prog-chart{display:block}
+.prog-summary-row{display:flex;gap:8px;margin-bottom:4px}
+.prog-stat-card{flex:1;background:#fff;border-radius:14px;padding:11px 12px;box-shadow:0 1px 6px rgba(0,0,0,.06);text-align:center}
+.prog-stat-val{font-size:20px;font-weight:800;color:#1C1C2E}
+.prog-stat-lbl{font-size:10px;color:#8A8FA8;font-weight:600;margin-top:1px}
+
+/* Notification / tip card */
+.tip-card{border-radius:16px;padding:12px 14px;font-size:12px;line-height:1.65;font-weight:600;border:1.5px solid transparent}
+.tip-card.success{background:#E8F4EF;color:#3D7D5A;border-color:#A8DFC0}
+.tip-card.warning{background:#FEF3E0;color:#C07C1A;border-color:#FAC775}
+.tip-card.danger{background:#FDEAEA;color:#C13030;border-color:#F09595}
+.tip-card.info{background:#EEF0FE;color:#3C3489;border-color:#AFA9EC}
+
+/* Onboarding name screen */
+#s-onboarding{background:#fff}
+.onboard-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center}
+.onboard-emoji{font-size:52px;margin-bottom:18px}
+.onboard-title{font-size:22px;font-weight:800;color:#1C1C2E;line-height:1.3;margin-bottom:10px}
+.onboard-sub{font-size:13.5px;color:#8A8FA8;line-height:1.7;margin-bottom:28px}
+.onboard-input{width:100%;border:2px solid #E8EAF0;border-radius:16px;padding:14px 16px;font-family:'Nunito',sans-serif;font-size:16px;color:#1C1C2E;background:#F8F9FC;outline:none;transition:border .2s;text-align:center}
+.onboard-input:focus{border-color:#3D7D5A;background:#fff}
+.onboard-skip{background:none;border:none;font-family:'Nunito',sans-serif;font-size:12.5px;color:#8A8FA8;cursor:pointer;padding:8px;margin-top:4px}
+
+/* ── Rappel / Notification banner ── */
+.rappel-banner{
+  position:absolute;top:0;left:0;right:0;z-index:100;
+  background:#1C1C2E;color:#fff;
+  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  animation:slideDown .35s cubic-bezier(.4,0,.2,1);
+  border-radius:0 0 16px 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.rappel-dot{width:8px;height:8px;border-radius:50%;background:#3D7D5A;flex-shrink:0;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.rappel-text{flex:1;font-size:12px;font-weight:600;line-height:1.45}
+.rappel-close{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:4px 10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;touch-action:manipulation}
+
+/* ── Protocole card enrichie ── */
+.protocole-card{background:linear-gradient(135deg,#1C1C2E 0%,#2D3A4A 100%);border-radius:18px;padding:16px;color:#fff}
+.protocole-card-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px}
+.protocole-card-name{font-size:15px;font-weight:800;margin-bottom:10px;line-height:1.3}
+.protocole-card-objectives{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.protocole-card-obj{display:flex;align-items:center;gap:7px;font-size:11.5px;color:rgba(255,255,255,.85)}
+.protocole-card-obj-dot{width:6px;height:6px;border-radius:50%;background:#3D7D5A;flex-shrink:0}
+.protocole-progress-wrap{background:rgba(255,255,255,.1);border-radius:10px;height:6px;overflow:hidden;margin-bottom:6px}
+.protocole-progress-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#4CAF78,#7FD9A8);transition:width .8s ease}
+
+/* ── Premium lock teaser ── */
+.premium-teaser{background:linear-gradient(135deg,#EEF0FE,#F2ECFC);border-radius:16px;padding:14px;border:1.5px solid #AFA9EC;text-align:center;position:relative;overflow:hidden}
+.premium-teaser::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(123,79,207,.1)}
+.premium-badge{display:inline-flex;align-items:center;gap:5px;background:#7B4FCF;color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.premium-title{font-size:13px;font-weight:800;color:#3C3489;margin-bottom:5px}
+.premium-features{font-size:11.5px;color:#5A5A8A;line-height:1.7;margin-bottom:10px}
+.btn-premium{background:#7B4FCF;color:#fff;border:none;border-radius:50px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;touch-action:manipulation;width:100%}
+
+/* ── Rappel activation switch ── */
+.rappel-switch-row{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.rappel-switch-label{font-size:12.5px;font-weight:700;color:#1C1C2E}
+.rappel-switch-sub{font-size:10.5px;color:#8A8FA8;margin-top:1px}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:#E8EAF0;border-radius:12px;transition:background .2s;cursor:pointer}
+.toggle-track::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-switch input:checked+.toggle-track{background:#3D7D5A}
+.toggle-switch input:checked+.toggle-track::after{transform:translateX(20px)}
+
+</style>
+</head>
+<body>
+<div class="phone" id="the-phone">
+  <!-- ── Module 8 : Bannière rappel quotidien ── -->
+  <div class="rappel-banner" id="rappel-banner" style="display:none">
+    <div class="rappel-dot"></div>
+    <div class="rappel-text" id="rappel-text">Faites votre check aujourd'hui (10 sec)</div>
+    <button class="rappel-close" onclick="dismissRappel()">Check →</button>
+  </div>
+
+  <div class="pdf-overlay" id="pdf-overlay">
+    <div class="pdf-spin"></div>
+    <div class="pdf-msg" id="pdf-msg">Génération du PDF...</div>
+  </div>
+
+  <!-- LANDING -->
+  <div id="s-land" class="screen active">
+    <div class="land-bg">
+      <svg class="brain-svg" viewBox="0 0 100 100" fill="none">
+        <ellipse cx="50" cy="52" rx="34" ry="30" fill="#F7C4BC" opacity=".3"/>
+        <path d="M28 45C26 38 30 30 38 28c4-2 8-1 10 2 2-3 6-4 10-2 8 2 12 10 10 17 3 3 4 8 2 12-2 6-8 9-14 8-2 3-6 5-10 3-4 2-8 0-10-3-6-1-12-4-14-10-2-5 0-9 6-10z" fill="#F4A89A"/>
+        <path d="M48 30v36" stroke="#E8756A" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+        <path d="M32 38c2-2 5-2 6 0M62 38c1-2 4-2 5 0M30 50c2-4 6-6 10-4M60 46c4-2 8 0 10 4M34 57c2-2 6-2 8 0M58 57c2-2 6-2 8 0" stroke="#E8756A" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>
+        <circle cx="36" cy="42" r="3" fill="#E8756A" opacity=".2"/>
+        <circle cx="64" cy="42" r="3" fill="#E8756A" opacity=".2"/>
+        <ellipse cx="50" cy="78" rx="20" ry="4" fill="#1C1C2E" opacity=".06"/>
+      </svg>
+    </div>
+    <div class="land-content">
+      <h1 class="land-title">Évaluez votre<br>équilibre physiologique</h1>
+      <p class="land-desc">Ce scan analyse 5 axes<br>fondamentaux de votre santé.</p>
+      <p class="land-dur">Durée : 2 minutes.</p>
+      <button class="btn-cta" onclick="startQuiz()">Commencer l'évaluation</button>
+    </div>
+    <div class="land-brand">
+      <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      Prime Health Clinic
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="s-quiz" class="screen">
+    <div class="quiz-top">
+      <div class="axe-header">
+        <span class="axe-lbl" id="axe-lbl">Étape 1 / 5</span>
+        <span class="q-cnt" id="q-cnt">Q 1 / 30</span>
+      </div>
+      <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    </div>
+    <div class="quiz-card" id="quiz-card">
+      <div class="axe-icon-c" id="axe-icon-c"></div>
+      <div class="q-nm" id="q-nm"></div>
+      <div class="q-tx" id="q-tx"></div>
+      <div class="q-sb" id="q-sb"></div>
+      <div class="ans-list" id="ans-list"></div>
+    </div>
+    <div class="quiz-footer">
+      <div class="axe-sc-mini" id="axe-sc-mini">Score axe : 0 / 18</div>
+      <div class="quiz-nav">
+        <button class="btn-prev" id="btn-prev" onclick="goBack()" style="visibility:hidden">← Retour</button>
+        <button class="btn-nxt" id="btn-nxt" onclick="goNext()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSE -->
+  <div id="s-analyse" class="screen">
+    <div class="an-wrap">
+      <div class="spin"></div>
+      <div class="an-title">Analyse en cours...</div>
+      <div class="an-sb">Calcul de votre profil physiologique</div>
+      <div class="an-steps">
+        <div class="an-step" id="ast0"><div class="an-dot">✓</div>Inflammation / Digestif</div>
+        <div class="an-step" id="ast1"><div class="an-dot">✓</div>Stress neuro-endocrinien</div>
+        <div class="an-step" id="ast2"><div class="an-dot">✓</div>Axe métabolique</div>
+        <div class="an-step" id="ast3"><div class="an-dot">✓</div>Énergie &amp; Fatigue</div>
+        <div class="an-step" id="ast4"><div class="an-dot">✓</div>Psycho-émotionnel</div>
+      </div>
+      <div class="land-brand" style="margin-top:20px">
+        <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        Prime Health Clinic
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="s-results" class="screen">
+    <div class="res-top">
+      <div class="res-logo-sm">
+        <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        Vos résultats
+      </div>
+      <button class="btn-redo" onclick="restart()">↺ Recommencer</button>
+    </div>
+    <div class="slides-viewport">
+      <div class="slides-track" id="slides-track">
+
+        <!-- ══ SLIDE 1 : Profil + Tension + Priorités ══ -->
+        <div class="slide" id="slide-0">
+          <div id="profile-box"></div>
+          <div class="rcard" id="analysis-block">
+            <div class="rcard-title">📊 Vue d'ensemble</div>
+            <div class="radar-wrap"><canvas id="radarChart" width="190" height="190"></canvas></div>
+            <div class="total-row"><span class="total-lbl">Score global</span><span class="total-num" id="total-num">— / 90</span></div>
+          </div>
+          <div id="tension-block"></div>
+          <div id="priorities-block"></div>
+        </div>
+
+        <!-- ══ SLIDE 2 : Analyse par axe ══ -->
+        <div class="slide" id="slide-1">
+          <div class="rcard">
+            <div class="rcard-title">📈 Analyse détaillée par axe</div>
+            <div id="score-detail"></div>
+            <div style="display:flex;gap:9px;margin-top:10px;flex-wrap:wrap">
+              <div class="leg-item"><div class="leg-dot" style="background:#4CAF78"></div>Faible 0–6</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#C07C1A"></div>Moyen 7–12</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#C13030"></div>Élevé 13–18</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ SLIDE 3 : Que faire + Plan + Produit ══ -->
+        <div class="slide" id="slide-2">
+          <div id="whatnow-block"></div>
+          <div id="plan-block"></div>
+          <div id="product-card-slot"></div>
+        </div>
+
+        <!-- ══ SLIDE 4 : Reco cliniques + Email + PDF ══ -->
+        <div class="slide" id="slide-3">
+          <div class="rcard" style="margin-bottom:9px">
+            <div class="rcard-title">✅ Recommandations cliniques</div>
+            <div id="rec-list"></div>
+          </div>
+          <div class="email-block">
+            <div class="email-lbl">✉️ Recevoir par email</div>
+            <div class="email-row" id="email-row">
+              <input class="email-in" type="email" id="email-in" placeholder="votre@email.com">
+              <button class="btn-send" onclick="sendEmail()">Envoyer</button>
+            </div>
+            <div class="email-ok" id="email-ok">✓ Bilan envoyé !</div>
+            <p class="email-note">Vos données restent confidentielles.</p>
+          </div>
+          <div class="pdf-btn-wrap">
+            <button class="pdf-btn" onclick="downloadPDF()"><span>📄</span> Télécharger le bilan PDF</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="slide-nav">
+      <button class="btn-slide prev" id="btn-prev-slide" onclick="goSlide(-1)" disabled>← Précédent</button>
+      <div class="dots">
+        <div class="dot active" onclick="jumpSlide(0)"></div>
+        <div class="dot" onclick="jumpSlide(1)"></div>
+        <div class="dot" onclick="jumpSlide(2)"></div>
+        <div class="dot" onclick="jumpSlide(3)"></div>
+      </div>
+      <button class="btn-slide next" id="btn-next-slide" onclick="goSlide(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ ONBOARDING — NOM ══════════ -->
+  <div id="s-onboarding" class="screen">
+    <div class="onboard-wrap">
+      <div class="onboard-emoji">👋</div>
+      <h2 class="onboard-title">Bienvenue dans<br>votre espace suivi</h2>
+      <p class="onboard-sub">Pour personnaliser votre expérience,<br>comment souhaitez-vous être appelé ?</p>
+      <input class="onboard-input" id="onboard-name-in" type="text" placeholder="Votre prénom" maxlength="24" autocomplete="given-name">
+      <div style="height:16px"></div>
+      <button class="btn-suivi-start" onclick="validateOnboarding()" style="max-width:280px;width:100%">C'est parti ! →</button>
+      <button class="onboard-skip" onclick="validateOnboarding(true)">Passer cette étape</button>
+    </div>
+    <div class="land-brand" style="justify-content:center;padding-bottom:16px">
+      <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      Prime Health Clinic
+    </div>
+  </div>
+
+  <!-- ══════════ SUIVI — ENTRÉE ══════════ -->
+  <div id="s-suivi-entry" class="screen">
+    <div class="suivi-header">
+      <button class="suivi-back" onclick="show("s-results")">←</button>
+      <span class="suivi-header-title">Suivi quotidien</span>
+      <div style="width:32px"></div>
+    </div>
+    <div class="suivi-scroll">
+      <div style="text-align:center;padding:16px 0 10px">
+        <div style="font-size:46px;margin-bottom:12px">🎯</div>
+        <div style="font-size:19px;font-weight:800;color:#1C1C2E;margin-bottom:8px">Suivez votre évolution</div>
+        <div style="font-size:13px;color:#4A4A6A;line-height:1.75;max-width:290px;margin:0 auto">
+          Votre bilan est une première étape.<br>
+          <strong style="color:#1C1C2E">Pour améliorer votre santé durablement,<br>il est essentiel de suivre votre progression.</strong>
+        </div>
+      </div>
+      <!-- V3 spec : 3 bénéfices core -->
+      <div style="background:#F8F9FC;border-radius:16px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:10px">📈 En seulement 10 secondes par jour :</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;background:#E8F4EF;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔋</div>
+            <div style="font-size:13px;font-weight:700;color:#1C1C2E">Suivez votre énergie</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;background:#EEF0FE;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📊</div>
+            <div style="font-size:13px;font-weight:700;color:#1C1C2E">Observez votre évolution</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;background:#FEF3E0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🎯</div>
+            <div style="font-size:13px;font-weight:700;color:#1C1C2E">Ajustez votre équilibre</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-suivi-start" onclick="startSuiviFlow()">Commencer mon suivi →onclick="demarrerSuivi()"</button>
+      <!-- Module 9 : PWA -->
+      <div class="suivi-pwa-block" id="pwa-block">
+        <div style="font-size:11px;font-weight:700;color:#3D7D5A;margin-bottom:5px">📲 Accédez facilement à votre suivi</div>
+        <div style="font-size:11px;color:#8A8FA8;line-height:1.7;margin-bottom:4px">Ajoutez cette app à votre écran d'accueil<br>pour suivre votre progression chaque jour.</div>
+        <div style="font-size:10.5px;color:#B0B4C8;line-height:1.65">👉 iPhone : bouton partager → "Sur l'écran d'accueil"<br>👉 Android : "Ajouter à l'écran d'accueil"</div>
+        <button onclick="document.getElementById('pwa-block').style.display='none'" style="margin-top:8px;background:none;border:none;font-size:11px;color:#3D7D5A;font-weight:700;cursor:pointer;padding:0">J'ai compris ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SUIVI — CHECK QUOTIDIEN ══════════ -->
+  <div id="s-check" class="screen">
+    <div style="background:#fff;padding:13px 16px 10px;flex-shrink:0;border-bottom:.5px solid #F0F2F7">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <button class="suivi-back" onclick="show('s-dashboard')" style="font-size:16px">← Retour</button>
+        <span class="suivi-header-title">Check du jour</span>
+        <div id="check-filled-count" style="font-size:11px;font-weight:700;color:#8A8FA8">0 / 5</div>
+      </div>
+      <div class="check-progress-bar"><div class="check-progress-fill" id="check-prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="suivi-scroll">
+      <div style="text-align:center;padding:8px 0 4px">
+        <div style="font-size:11px;color:#8A8FA8;font-weight:600" id="check-date-label"></div>
+        <div style="font-size:15px;font-weight:800;color:#1C1C2E;margin-top:3px">Comment vous sentez-vous ?</div>
+        <div style="font-size:11.5px;color:#8A8FA8;margin-top:3px">1 = Très bien · 5 = Très mauvais</div>
+      </div>
+      <div id="check-axes-list" class="check-axes"></div>
+      <button class="btn-suivi-start" id="btn-validate-check" onclick="validateCheck()" style="opacity:.35;pointer-events:none;margin-top:4px">✓ Valider mon check</button>
+      <div style="text-align:center;font-size:11px;color:#B0B4C8;padding-bottom:4px">Les données restent sur votre appareil</div>
+    </div>
+  </div>
+
+  <!-- ══════════ SUIVI — SCORE DU JOUR ══════════ -->
+  <div id="s-score" class="screen">
+    <div class="suivi-header">
+      <button class="suivi-back" onclick="show('s-dashboard')">←</button>
+      <span class="suivi-header-title">Votre score du jour</span>
+      <div style="width:32px"></div>
+    </div>
+    <div class="suivi-scroll">
+      <div class="score-circle-wrap">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="68" fill="none" stroke="#F0F2F7" stroke-width="12"/>
+          <circle id="score-arc" cx="80" cy="80" r="68" fill="none" stroke="#3D7D5A" stroke-width="12"
+            stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427"
+            transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="score-circle-inner">
+          <div class="score-big" id="score-big">—</div>
+          <div class="score-sub">/100</div>
+        </div>
+      </div>
+      <div class="score-delta" id="score-delta"></div>
+      <div class="score-feedback-box" id="score-feedback"></div>
+      <div class="score-axes-grid" id="score-axes-grid" style="margin-top:2px"></div>
+      <div style="display:flex;gap:8px;padding:0 2px 4px;margin-top:2px">
+        <button class="btn-suivi-secondary" style="flex:1" onclick="show('s-progression')">📈 Progression</button>
+        <button class="btn-suivi-start" style="flex:1" onclick="show('s-dashboard')">Tableau de bord</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SUIVI — PROGRESSION ══════════ -->
+  <div id="s-progression" class="screen">
+    <div class="suivi-header">
+      <button class="suivi-back" onclick="show('s-dashboard')">←</button>
+      <span class="suivi-header-title">Ma progression</span>
+      <div style="width:32px"></div>
+    </div>
+    <div class="suivi-scroll">
+      <!-- Statistiques rapides -->
+      <div class="prog-summary-row" id="prog-stats-row"></div>
+      <!-- Graphique évolution -->
+      <div class="rcard">
+        <div class="rcard-title">📈 Évolution — 7 derniers jours</div>
+        <canvas id="prog-chart" height="100" style="width:100%"></canvas>
+        <div id="prog-weeks" style="display:flex;justify-content:space-between;margin-top:6px;font-size:9.5px;color:#8A8FA8;font-weight:600;padding:0 2px"></div>
+      </div>
+      <!-- Évolution par axe -->
+      <div class="rcard">
+        <div class="rcard-title">📊 Évolution par axe</div>
+        <div id="prog-axes"></div>
+      </div>
+      <!-- Tip / conseil -->
+      <div id="prog-tip"></div>
+      <!-- Réévaluation -->
+      <div class="rcard" id="reeval-block" style="display:none;border:1.5px solid rgba(232,104,10,.2)">
+        <div style="font-size:12px;font-weight:700;color:#E8680A;margin-bottom:5px">🔄 Réévaluez votre profil</div>
+        <div style="font-size:11.5px;color:#4A4A6A;margin-bottom:9px;line-height:1.6">Votre état a évolué. Refaites votre bilan pour ajuster votre protocole.</div>
+        <button class="btn-suivi-start" onclick="restart()">Refaire mon bilan complet</button>
+      </div>
+      <!-- Protocole — Module 10 -->
+      <div id="protocole-card-wrap"></div>
+      <!-- Rappels — Module 8 settings -->
+      <div class="rappel-switch-row">
+        <div>
+          <div class="rappel-switch-label">🔔 Rappels quotidiens</div>
+          <div class="rappel-switch-sub">Max 1 message / jour si check non effectué</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="rappel-toggle" onchange="toggleRappels(this.checked)" checked>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <!-- Premium teaser — Monétisation -->
+      <div class="premium-teaser">
+        <div class="premium-badge">🔒 Premium</div>
+        <div class="premium-title">Débloquez l'analyse avancée</div>
+        <div class="premium-features">✦ Historique complet (90 jours)<br>✦ Recommandations évolutives<br>✦ Ajustement personnalisé de protocole<br>✦ Export PDF de progression mensuel</div>
+        <button class="btn-premium" onclick="alert('Fonctionnalité Premium — bientôt disponible !')">Passer à Premium</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SUIVI — DASHBOARD ══════════ -->
+  <div id="s-dashboard" class="screen" style="background:#F0F2F7">
+    <div class="dash-header">
+      <div>
+        <div class="dash-greeting" id="dash-greeting">Bonjour 👋</div>
+        <div class="dash-date" id="dash-date"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="dash-streak-badge"></div>
+        <div class="blogo" style="width:32px;height:32px;cursor:pointer;flex-shrink:0" onclick="show('s-results')">
+          <svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="suivi-scroll">
+      <!-- Score card -->
+      <div class="dash-score-card" id="dash-score-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A8FA8;margin-bottom:4px">Score santé du jour</div>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <div class="dash-score-big" id="dash-score-big">—</div>
+              <div style="font-size:14px;font-weight:600;color:#8A8FA8">/ 100</div>
+            </div>
+            <div class="dash-score-delta" id="dash-score-delta"></div>
+          </div>
+          <canvas id="dash-sparkline" class="dash-sparkline" width="70" height="36"></canvas>
+        </div>
+        <div id="done-today-badge"></div>
+      </div>
+      <!-- Actions -->
+      <div class="dash-actions">
+        <button class="dash-action-primary" id="dash-check-btn" onclick="goToCheckFromDash()">
+          <span style="font-size:22px" id="dash-check-icon">⚡</span>
+          <div style="text-align:left;flex:1">
+            <div style="font-size:13px;font-weight:800" id="dash-check-label">Faire mon check</div>
+            <div style="font-size:10.5px;opacity:.8" id="dash-check-sub">10 secondes · 5 axes</div>
+          </div>
+          <span style="font-size:18px;opacity:.7">→</span>
+        </button>
+        <div style="display:flex;gap:8px">
+          <button class="dash-action-secondary" onclick="show('s-progression')"><span>📈</span> Progression</button>
+          <button class="dash-action-secondary" onclick="show('s-results')"><span>📋</span> Mon bilan</button>
+          <button class="dash-action-secondary" onclick="restart()"><span>🔄</span> Refaire</button>
+        </div>
+      </div>
+      <!-- Objectif -->
+      <div class="rcard">
+        <div class="rcard-title">🎯 Objectif prioritaire</div>
+        <div id="dash-objectif" style="font-size:12.5px;color:#4A4A6A;line-height:1.7"></div>
+      </div>
+      <!-- Axe focus -->
+      <div class="rcard">
+        <div class="rcard-title">📍 Axe à travailler aujourd'hui</div>
+        <div id="dash-focus-content"></div>
+      </div>
+      <!-- Conseil du jour -->
+      <div id="dash-tip-card"></div>
+      <!-- Module 10 : lien protocole ↔ suivi -->
+      <div id="dash-protocole-mini"></div>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+<div id="pdf-container" style="position:fixed;left:-9999px;top:0;width:620px;height:auto;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#1C1C2E;padding:40px 44px;visibility:hidden;z-index:-1;overflow:visible"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   DONNÉES QUESTIONNAIRE
+═══════════════════════════════════════════ */
+const AXES=[
+  {name:"Inflammation / Digestif",short:"Digestif",key:"digestif",color:"#E8680A",bg:"#FEF0E6",icon:"🫁",
+   sub:"Comment se manifeste votre digestion au quotidien ?",
+   qs:["Ressentez-vous des ballonnements après les repas ?","Votre transit est-il irrégulier (constipation / diarrhée) ?","Ressentez-vous des douleurs abdominales ?","Êtes-vous fatigué après les repas ?","Avez-vous un brouillard mental ?","Êtes-vous sensible à certains aliments ?"]},
+  {name:"Stress (Neuro-endocrinien)",short:"Stress",key:"stress",color:"#7B4FCF",bg:"#F2ECFC",icon:"🧠",
+   sub:"Comment avez-vous ressenti votre niveau de stress ces derniers temps ?",
+   qs:["Avez-vous du mal à vous détendre ?","Ressentez-vous un stress constant ?","Vous réveillez-vous la nuit ?","Êtes-vous fatigué au réveil ?","Êtes-vous facilement irritable ?","Avez-vous des difficultés de concentration ?"]},
+  {name:"Métabolique",short:"Métabolisme",key:"metabolisme",color:"#1A8C6E",bg:"#E6F6F2",icon:"⚡",
+   sub:"Comment évaluez-vous votre appétit et votre énergie après les repas ?",
+   qs:["Avez-vous des fringales sucrées ?","Ressentez-vous un coup de fatigue après les repas ?","Avez-vous des difficultés à perdre du poids ?","Stockez-vous facilement au niveau abdominal ?","Votre énergie est-elle instable dans la journée ?","Ressentez-vous des sensations d'hypoglycémie ?"]},
+  {name:"Énergie / Fatigue",short:"Énergie",key:"energie",color:"#3A7DC9",bg:"#EBF3FB",icon:"🔋",
+   sub:"Comment vous sentez-vous par rapport à votre niveau de forme physique ?",
+   qs:["Ressentez-vous une fatigue persistante ?","Avez-vous des difficultés à récupérer ?","Manquez-vous de motivation physique ?","Vous épuisez-vous rapidement ?","Avez-vous besoin de stimulants (café / sucre) ?","Ressentez-vous une baisse d'énergie dans la journée ?"]},
+  {name:"Psycho-émotionnel",short:"Psycho",key:"psycho",color:"#C0424A",bg:"#FCEAEA",icon:"💚",
+   sub:"Comment allez-vous psycho-émotionnellement ces derniers temps ?",
+   qs:["Ressentez-vous une perte de plaisir ?","Avez-vous une anxiété diffuse ?","Ressentez-vous une charge mentale élevée ?","Avez-vous des pensées envahissantes ?","Avez-vous une sensation de perte de contrôle ?","Votre humeur est-elle instable ?"]}
+];
+const ANS=["Jamais","Parfois","Souvent","Très souvent"];
+const PILL_SEL=["sel-0","sel-1","sel-2","sel-3"];
+let answers=new Array(30).fill(null),cur=0,gScores=[],curSlide=0,gReco={};
+
+/* ═══════════════════════════════════════════
+   FICHES PRODUITS
+═══════════════════════════════════════════ */
+const PRODUCTS={
+  digestif:{emoji:'🫁',cat:'Digestif',name:'Digestive Reset Protocol',headline:'Réinitialisez votre système digestif et retrouvez votre énergie',color:'#E8680A',bg:'#FEF0E6',benefits:["Digestion plus légère et confort immédiat","Réduction des ballonnements","Regain d'énergie et meilleure assimilation"],ingredients:'Probiotiques multi-souches · L-glutamine · Enzymes digestives',cta:'Commencer mon reset digestif'},
+  stress:{emoji:'🧠',cat:'Stress & Nerveux',name:'Neuro Balance System',headline:'Calmez votre système nerveux et retrouvez un équilibre intérieur',color:'#7B4FCF',bg:'#F2ECFC',benefits:["Réduction du stress et de l\'anxiété","Sommeil amélioré et récupération","Esprit plus calme et focus retrouvé"],ingredients:'Magnésium bisglycinate · Ashwagandha · Rhodiola · Oméga 3',cta:'Rééquilibrer mon système nerveux'},
+  metabolisme:{emoji:'⚡',cat:'Métabolisme',name:'Metabolic Repair Stack',headline:'Stabilisez votre métabolisme et votre énergie',color:'#1A8C6E',bg:'#E6F6F2',benefits:["Énergie stable tout au long de la journée","Réduction des fringales sucrées","Meilleure gestion du poids"],ingredients:'Berbérine · Chrome · Fibres · Oméga 3',cta:'Relancer mon métabolisme'},
+  energie:{emoji:'🔋',cat:'Énergie & Vitalité',name:'Energy Recovery Formula',headline:'Rechargez votre énergie en profondeur',color:'#3A7DC9',bg:'#EBF3FB',benefits:["Énergie durable sans coup de fatigue","Meilleure récupération physique","Regain de vitalité et motivation"],ingredients:'CoQ10 · Vitamines B · Fer biodisponible',cta:'Retrouver mon énergie'},
+  psycho:{emoji:'💚',cat:'Psycho-émotionnel',name:'Emotional Balance Protocol',headline:'Stabilisez votre équilibre émotionnel',color:'#C0424A',bg:'#FCEAEA',benefits:["Apaisement mental et réduction de l\'anxiété","Humeur stable et équilibrée","Meilleure gestion émotionnelle"],ingredients:'Safran · L-théanine · Magnésium · Oméga 3',cta:'Retrouver mon équilibre'},
+  combo_digestif_stress:{emoji:'🔥',cat:'Pack Premium',name:'Gut & Brain Reset',headline:'Rééquilibrez votre digestion et votre système nerveux',color:'#5B3FA0',bg:'#F3EEFE',benefits:["Moins de stress et meilleure digestion","Énergie stable et récupération optimale","Action combinée axe intestin-cerveau"],ingredients:'Probiotiques · Magnésium · Ashwagandha · Enzymes · Oméga 3',cta:'Commencer mon reset global',isPack:true},
+  optimisation:{emoji:'🌿',cat:'Optimisation',name:'Pack Optimisation',headline:'Maintenez et optimisez votre équilibre physiologique',color:'#3D7D5A',bg:'#E8F4EF',benefits:["Maintien de l'équilibre global","Optimisation de l'énergie et récupération","Protection et prévention sur le long terme"],ingredients:'Multivitamines · Oméga 3 · Magnésium · Adaptogènes',cta:'Optimiser mon potentiel santé'}
+};
+function getProductKey(reco){
+  if(reco.profile==='homogene')return'optimisation';
+  const p1=reco.priority1?.name,p2=reco.priority2?.name;
+  if(p1&&p2&&((p1==='digestif'&&p2==='stress')||(p1==='stress'&&p2==='digestif')))return'combo_digestif_stress';
+  return p1||'optimisation';
+}
+
+/* ═══════════════════════════════════════════
+   TEXTES PROFILS (version convertit)
+═══════════════════════════════════════════ */
+const PROFILES={
+  combined:{
+    badge:'🔴 Profil Combiné',
+    sub:'⚠️ Déséquilibre systémique détecté',
+    cls:'combined',
+    desc:`Votre bilan révèle que plusieurs systèmes de votre organisme sont actuellement déséquilibrés simultanément.\n\nCela signifie que votre corps ne compense plus correctement, ce qui peut entraîner une fatigue persistante, des troubles digestifs ou inflammatoires, et une baisse de vos capacités physiques et mentales.\n\nSans prise en charge, ce type de profil a tendance à s'aggraver progressivement.\n\n✅ Bonne nouvelle : ce profil est réversible, à condition d'agir de manière globale et structurée.`,
+    checks:['≥ 2 axes ≥ 7','Interaction entre systèmes','Déséquilibre global'],
+    zone:"Priorité d'intervention",zoneText:'Ciblage multi-systèmes nécessaire.',
+    pc:{bg:'#FDEAEA',brd:'#F09595',zone:'#E24B4A',txt:'#791F1F'}
+  },
+  isole:{
+    badge:'🟡 Profil Isolé',
+    sub:'⚠️ Zone de déséquilibre ciblée',
+    cls:'isole',
+    desc:`Votre bilan met en évidence un système spécifique en déséquilibre, tandis que les autres restent encore stables.\n\nCela indique une zone de fragilité qui peut, avec le temps, impacter votre énergie, perturber d'autres systèmes, et évoluer vers un déséquilibre plus global.\n\nSans correction, ce déséquilibre peut progressivement s'étendre.\n\n✅ Bonne nouvelle : une action ciblée permet généralement une correction rapide et efficace.`,
+    checks:['1 axe ≥ 7','Les autres ≤ 6','Système encore stable'],
+    zone:'Zone de prévention',zoneText:'Prévenir la progression du déséquilibre.',
+    pc:{bg:'#FEF3E0',brd:'#FAC775',zone:'#BA7517',txt:'#633806'}
+  },
+  homogene:{
+    badge:'🟢 Profil Homogène',
+    sub:'✅ Équilibre physiologique global',
+    cls:'homogene',
+    desc:`Votre bilan montre que vos principaux systèmes sont globalement équilibrés.\n\nVotre organisme fonctionne de manière stable, ce qui favorise une bonne énergie, une récupération efficace et un équilibre global.\n\n⚠️ Cependant, cet équilibre reste dépendant de vos habitudes actuelles.\n\n📈 Objectif : maintenir cet état et optimiser votre potentiel santé.`,
+    checks:['Tous les axes ≤ 6','Système régulé','Équilibre global'],
+    zone:"Zone d'optimisation",zoneText:"Maintien et optimisation de votre potentiel.",
+    pc:{bg:'#E8F4EF',brd:'#A8DFC0',zone:'#3D7D5A',txt:'#085041'}
+  }
+};
+
+/* ═══════════════════════════════════════════
+   TEXTES PAR AXE selon niveau (faible/moyen/élevé)
+═══════════════════════════════════════════ */
+const AXE_TEXTS={
+  digestif:{
+    eleve:{title:'🔎 Surcharge digestive détectée',body:"Votre bilan indique un déséquilibre digestif important, souvent lié à une inflammation ou une dysbiose. Cela peut entraîner fatigue après les repas, troubles digestifs récurrents, et baisse d'immunité. À long terme, cela peut impacter l'ensemble de votre équilibre physiologique.",cta:"Une correction ciblée permet généralement une amélioration rapide."},
+    moyen:{title:'⚠️ Fragilité digestive',body:"Votre système digestif montre des signes de déséquilibre modéré. Cela peut évoluer vers un terrain inflammatoire si rien n'est fait.",cta:"Une action préventive permet de stabiliser rapidement cet axe."},
+    faible:{title:'✅ Équilibre digestif satisfaisant',body:"Votre digestion semble globalement stable.",cta:"Objectif : maintenir cet équilibre et optimiser votre confort digestif."}
+  },
+  stress:{
+    eleve:{title:'🔎 Surcharge du système nerveux',body:"Votre organisme semble en état de stress chronique. Cela peut entraîner fatigue nerveuse, troubles du sommeil, irritabilité. À long terme : dérèglement hormonal et épuisement.",cta:"Une régulation du stress est prioritaire."},
+    moyen:{title:'⚠️ Stress modéré',body:"Votre système nerveux est sollicité mais encore adaptable.",cta:"Une régulation précoce évite un épuisement."},
+    faible:{title:'✅ Équilibre nerveux',body:"Bonne gestion du stress.",cta:"À maintenir."}
+  },
+  metabolisme:{
+    eleve:{title:'🔎 Déséquilibre métabolique',body:"Votre organisme montre des signes de dérèglement énergétique. Cela peut entraîner fringales, stockage abdominal, fatigue post-repas. Risque de syndrome métabolique à long terme.",cta:"Correction nutritionnelle nécessaire."},
+    moyen:{title:'⚠️ Instabilité métabolique',body:"Votre énergie est irrégulière.",cta:"Ajustements simples recommandés."},
+    faible:{title:'✅ Métabolisme stable',body:"Votre métabolisme fonctionne de façon équilibrée.",cta:"Objectif : maintenir cet équilibre."}
+  },
+  energie:{
+    eleve:{title:'🔎 Fatigue chronique détectée',body:"Votre organisme manque de ressources. Cela peut impacter motivation, récupération et performance.",cta:"Recharger l'organisme est prioritaire."},
+    moyen:{title:'⚠️ Baisse d\'énergie',body:"Votre niveau d'énergie est instable.",cta:"Optimisation recommandée."},
+    faible:{title:'✅ Bonne énergie globale',body:"Votre niveau d'énergie est satisfaisant.",cta:"À maintenir."}
+  },
+  psycho:{
+    eleve:{title:'🔎 Charge mentale élevée',body:"Votre équilibre émotionnel est impacté. Cela peut amplifier les autres déséquilibres.",cta:"Régulation psycho-émotionnelle essentielle."},
+    moyen:{title:'⚠️ Fragilité émotionnelle',body:"Votre équilibre émotionnel montre quelques signes de tension.",cta:"Un soutien ciblé est recommandé."},
+    faible:{title:'✅ Équilibre émotionnel',body:"Votre équilibre psycho-émotionnel est satisfaisant.",cta:"À maintenir."}
+  }
+};
+
+function getAxeLvlKey(score){return score<=6?'faible':score<=12?'moyen':'eleve';}
+function getAxeLabel(key){
+  return {digestif:'Système digestif & Inflammation',stress:'Stress neuro-endocrinien',metabolisme:'Métabolisme',energie:'Énergie & Fatigue',psycho:'Psycho-émotionnel'}[key]||key;
+}
+
+/* ═══════════════════════════════════════════
+   LOGIQUE DE PRIORISATION & PACKS
+═══════════════════════════════════════════ */
+function generateRecommendation(scores){
+  const axes=[
+    {name:'digestif',score:scores[0]},{name:'stress',score:scores[1]},
+    {name:'metabolisme',score:scores[2]},{name:'energie',score:scores[3]},{name:'psycho',score:scores[4]}
+  ];
+  const sorted=[...axes].sort((a,b)=>b.score-a.score);
+  const highAxes=axes.filter(a=>a.score>=7);
+  let profileType=highAxes.length>=2?'combined':highAxes.length===1?'isole':'homogene';
+  let p1,p2;
+  if(profileType==='combined'){p1=sorted[0];p2=sorted[1];}
+  else if(profileType==='isole'){
+    p1=highAxes[0];
+    p2=sorted.find(a=>a.name!==p1.name&&(a.name==='stress'||a.name==='energie'))||sorted[1];
+  } else {
+    p1={name:'optimisation'};p2=null;
+  }
+  function getPack(a,b,type){
+    if(type==='homogene')return'Pack Optimisation';
+    const lbl={digestif:'Digestif',stress:'Stress',metabolisme:'Métabolisme',energie:'Énergie',psycho:'Psycho'};
+    if(b)return`Pack ${lbl[a.name]||a.name} & ${lbl[b.name]||b.name}`;
+    return`Pack ${lbl[a.name]||a.name}`;
+  }
+  let message='';
+  if(profileType==='combined'){
+    message=`🥇 Axe dominant — ${getAxeLabel(p1.name)}\n🥈 Axe secondaire — ${getAxeLabel(p2.name)}\n\n⚠️ Ces deux axes sont interconnectés et doivent être corrigés ensemble pour un résultat efficace.`;
+  } else if(profileType==='isole'){
+    message=`🥇 Axe principal — ${getAxeLabel(p1.name)}\n🥈 Axe support — ${getAxeLabel(p2.name)}\n\n🎯 Une action ciblée permettra une correction rapide et évitera une propagation du déséquilibre.`;
+  } else {
+    message=`🎯 Votre organisme est globalement équilibré.\n\nObjectif : optimiser votre énergie, votre récupération et maintenir cet équilibre sur le long terme.`;
+  }
+  return{profile:profileType,priority1:p1,priority2:p2,pack:getPack(p1,p2,profileType),message};
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function aScore(i){let s=0;for(let j=i*6;j<i*6+6;j++)if(answers[j]!==null)s+=answers[j];return s;}
+function gCol(s){return s<=6?'#4CAF78':s<=12?'#C07C1A':'#C13030';}
+function gLvl(s){return s<=6?{l:'Faible',c:'lvl-faible'}:s<=12?{l:'Moyen',c:'lvl-moyen'}:{l:'Élevé',c:'lvl-eleve'};}
+function startQuiz(){show('s-quiz');render();}
+function show(id){['s-land','s-quiz','s-analyse','s-results'].forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goBack(){if(cur>0){cur--;render();}}
+function goNext(){if(answers[cur]===null)return;if(cur===29)showAnalyse();else{cur++;render();}}
+function render(){
+  const ai=Math.floor(cur/6),ax=AXES[ai];
+  document.getElementById('axe-lbl').textContent=`Étape ${ai+1} / 5`;document.getElementById('axe-lbl').style.color=ax.color;
+  document.getElementById('q-cnt').textContent=`Q ${cur+1} / 30`;
+  const pf=document.getElementById('pfill');pf.style.width=Math.round(cur/30*100)+'%';pf.style.background=ax.color;
+  const ic=document.getElementById('axe-icon-c');ic.style.background=ax.bg;ic.style.fontSize='23px';ic.textContent=ax.icon;
+  const card=document.getElementById('quiz-card');card.style.animation='none';void card.offsetHeight;card.style.animation='';
+  document.getElementById('q-nm').textContent=ax.name;document.getElementById('q-nm').style.color=ax.color;
+  document.getElementById('q-tx').textContent=ax.qs[cur%6];document.getElementById('q-sb').textContent=ax.sub;
+  const al=document.getElementById('ans-list');al.innerHTML='';
+  ANS.forEach((a,i)=>{const b=document.createElement('button');b.className='ans-pill'+(answers[cur]===i?' '+PILL_SEL[i]:'');b.textContent=a;b.onclick=()=>{answers[cur]=i;render();};al.appendChild(b);});
+  document.getElementById('axe-sc-mini').textContent=`Score axe ${ai+1} : ${aScore(ai)} / 18`;
+  document.getElementById('btn-prev').style.visibility=cur===0?'hidden':'visible';
+  const nn=document.getElementById('btn-nxt');nn.className='btn-nxt'+(answers[cur]!==null?' ok':'');nn.style.background=ax.color;nn.style.color='#fff';nn.textContent=cur===29?'Voir mes résultats →':'Suivant →';
+}
+function showAnalyse(){show('s-analyse');document.querySelectorAll('.an-step').forEach((s,i)=>setTimeout(()=>s.classList.add('done'),i*380));setTimeout(buildResults,2300);}
+
+/* ═══════════════════════════════════════════
+   BUILD RESULTS
+═══════════════════════════════════════════ */
+function buildResults(){
+  gScores=AXES.map((_,i)=>aScore(i));
+  gReco=generateRecommendation(gScores);
+  const type=gReco.profile;
+  const p=PROFILES[type];
+  const packColors={combined:'#E24B4A',isole:'#BA7517',homogene:'#3D7D5A'};
+  const packBg={combined:'#FDEAEA',isole:'#FEF3E0',homogene:'#E8F4EF'};
+
+  /* ══ SLIDE 1 ══════════════════════════════════
+     1. Profil utilisateur
+  ═══════════════════════════════════════════════ */
+  const descLines=p.desc.split('\n').filter(l=>l.trim());
+  document.getElementById('profile-box').innerHTML=`
+    <div class="profile-box ${p.cls}" style="margin-bottom:9px;border-radius:20px;padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="font-size:28px">${type==='combined'?'🔴':type==='isole'?'🟡':'🟢'}</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:${p.pc.txt}">${p.badge.replace(/🔴|🟡|🟢/,'').trim()}</div>
+          <div style="font-size:11px;font-weight:600;color:${p.pc.txt};opacity:.8">${p.sub}</div>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:${p.pc.txt};line-height:1.7;margin-bottom:10px">${descLines.slice(0,2).map(l=>`<p style="margin-bottom:6px">${l}</p>`).join('')}</div>
+      <div style="background:${p.pc.zone};color:#fff;border-radius:9px;padding:8px 11px;font-size:11.5px;font-weight:700">${p.zone} — ${p.zoneText}</div>
+    </div>`;
+
+  document.getElementById('total-num').textContent=gScores.reduce((a,b)=>a+b,0)+' / 90';
+
+  /* ── 3. Bloc tension ── */
+  const tensionByType={
+    combined:{
+      title:'⚠️ Sans prise en charge, ce profil peut s\'aggraver',
+      items:[
+        '⚠️ <strong>Fatigue persistante</strong> si aucune action n\'est mise en place',
+        '⚠️ <strong>Troubles digestifs ou inflammatoires</strong> récurrents',
+        '⚠️ <strong>Baisse des capacités physiques et mentales</strong> progressive',
+        '⚠️ Ces axes sont interconnectés — agir sur un seul limiterait les résultats'
+      ]
+    },
+    isole:{
+      title:'⚠️ Ce déséquilibre peut progressivement s\'étendre',
+      items:[
+        '⚠️ <strong>Impact sur votre énergie</strong> si non corrigé rapidement',
+        '⚠️ <strong>Perturbation d\'autres systèmes</strong> par effet domino',
+        '⚠️ <strong>Évolution vers un déséquilibre plus global</strong> sans correction ciblée'
+      ]
+    },
+    homogene:{
+      title:'⚠️ Cet équilibre dépend de vos habitudes actuelles',
+      items:[
+        '⚠️ <strong>Un changement de mode de vie</strong> peut rapidement modifier cet équilibre',
+        '⚠️ <strong>L\'optimisation préventive</strong> reste la stratégie la plus efficace',
+        '📈 <strong>Objectif :</strong> consolider et optimiser votre potentiel santé'
+      ]
+    }
+  };
+  const t=tensionByType[type];
+  document.getElementById('tension-block').innerHTML=`
+    <div class="rcard" style="border-left:3px solid ${packColors[type]};margin-bottom:9px">
+      <div style="font-size:11px;font-weight:700;color:${packColors[type]};margin-bottom:8px">${t.title}</div>
+      ${t.items.map(i=>`<div style="font-size:11px;color:#4A4A6A;line-height:1.55;margin-bottom:5px;padding-left:2px">${i}</div>`).join('')}
+    </div>`;
+
+  /* ── 4. Priorités physiologiques ── */
+  const p1Label=gReco.priority1.name!=='optimisation'?getAxeLabel(gReco.priority1.name):null;
+  const p2Label=gReco.priority2?getAxeLabel(gReco.priority2.name):null;
+  document.getElementById('priorities-block').innerHTML=`
+    <div class="rcard" style="margin-bottom:9px">
+      <div class="rcard-title">🎯 Priorités physiologiques identifiées</div>
+      ${p1Label?`<div style="display:flex;align-items:center;gap:9px;background:${packBg[type]};border-radius:12px;padding:10px 12px;margin-bottom:7px">
+        <div style="width:22px;height:22px;border-radius:50%;background:${packColors[type]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0">1</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:${packColors[type]}">${p1Label}</div>
+          <div style="font-size:10px;color:#8A8FA8;margin-top:1px">Axe dominant — action prioritaire</div>
+        </div>
+      </div>`:''}
+      ${p2Label?`<div style="display:flex;align-items:center;gap:9px;background:#F8F9FC;border-radius:12px;padding:10px 12px;margin-bottom:7px">
+        <div style="width:22px;height:22px;border-radius:50%;background:#8A8FA8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0">2</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#4A4A6A">${p2Label}</div>
+          <div style="font-size:10px;color:#8A8FA8;margin-top:1px">Axe support — correction secondaire</div>
+        </div>
+      </div>`:''}
+      ${type!=='homogene'&&p2Label?`<div style="font-size:10.5px;color:${packColors[type]};font-weight:600;padding:7px 0 0;border-top:1px solid #F0F2F7">⚠️ Ces deux axes sont interconnectés. Agir sur un seul limiterait les résultats.</div>`:''}
+    </div>`;
+
+  /* ══ SLIDE 2 ══════════════════════════════════
+     Analyse par axe avec textes pro (max 2 axes élevés affichés en premier)
+  ═══════════════════════════════════════════════ */
+  const sortedAxesForDisplay=[...AXES.map((a,i)=>({...a,score:gScores[i]}))].sort((a,b)=>b.score-a.score);
+  document.getElementById('score-detail').innerHTML=sortedAxesForDisplay.map((a)=>{
+    const s=a.score,c=gCol(s),pct=Math.round(s/18*100),lvl=gLvl(s);
+    const lvlKey=getAxeLvlKey(s);
+    const txt=AXE_TEXTS[a.key][lvlKey];
+    return `<div class="sdr" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;align-items:center;gap:6px;width:100%">
+        <span class="sdr-ic">${a.icon}</span>
+        <div class="sdr-info">
+          <div class="sdr-nm">${a.name}<span class="lvl-badge ${lvl.c}">${lvl.l}</span></div>
+          <div class="sdr-bar"><div class="sdr-fill" style="width:${pct}%;background:${c}"></div></div>
+          <div class="sdr-meta">${s} points sur 18</div>
+        </div>
+        <div class="sdr-sc" style="color:${c}">${s}/18</div>
+      </div>
+      <div style="background:${c}18;border-left:3px solid ${c};border-radius:0 8px 8px 0;padding:7px 10px;width:100%">
+        <div style="font-size:10.5px;font-weight:700;color:${c};margin-bottom:3px">${txt.title}</div>
+        <div style="font-size:10.5px;color:#4A4A6A;line-height:1.55;margin-bottom:3px">${txt.body}</div>
+        <div style="font-size:10px;font-weight:600;color:${c}">${txt.cta}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* ══ SLIDE 3 ══════════════════════════════════
+     5. Que faire maintenant
+     6. Plan recommandé
+     7. Produit / Pack
+  ═══════════════════════════════════════════════ */
+
+  /* 5. Que faire maintenant */
+  document.getElementById('whatnow-block').innerHTML=`
+    <div class="rcard" style="margin-bottom:9px">
+      <div class="rcard-title">🧠 Que faire maintenant ?</div>
+      <div style="font-size:12px;color:#4A4A6A;line-height:1.7;margin-bottom:10px">
+        Votre bilan met en évidence des <strong>déséquilibres spécifiques</strong>. Pour corriger efficacement votre profil, il est essentiel d'agir de manière <strong>ciblée et structurée</strong>.
+      </div>
+      <div style="font-size:11.5px;color:#4A4A6A;line-height:1.65">
+        ${type==='combined'?'Une approche <strong>multi-systèmes simultanée</strong> est nécessaire pour des résultats durables.':type==='isole'?'Une action <strong>ciblée sur l\'axe principal</strong> permettra une correction rapide et efficace.':'Un programme d\'<strong>optimisation et maintenance</strong> vous permettra de consolider votre équilibre.'}
+      </div>
+    </div>`;
+
+  /* 6. Plan recommandé */
+  const planObjectifs={
+    combined:['Corriger les déséquilibres multi-systèmes identifiés','Relancer votre énergie et réduire la fatigue','Stabiliser votre organisme de manière globale'],
+    isole:['Corriger le déséquilibre sur l\'axe principal','Prévenir la propagation vers d\'autres systèmes','Relancer votre énergie et rétablir l\'équilibre'],
+    homogene:['Maintenir et consolider l\'équilibre existant','Optimiser votre énergie et récupération','Protéger votre santé sur le long terme']
+  };
+  const planAxes=[];
+  if(p1Label)planAxes.push({lbl:p1Label,color:packColors[type]});
+  if(p2Label)planAxes.push({lbl:p2Label,color:'#8A8FA8'});
+  document.getElementById('plan-block').innerHTML=`
+    <div class="rcard" style="margin-bottom:9px;border:1.5px solid ${packColors[type]}20">
+      <div class="rcard-title">🔬 Plan recommandé pour votre profil</div>
+      <div style="font-size:11px;color:#8A8FA8;margin-bottom:10px">Basé sur votre bilan du ${new Date().toLocaleDateString('fr-FR')}</div>
+      ${planAxes.map(ax=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px;font-weight:600;color:${ax.color}"><span style="font-size:14px">✅</span>${ax.lbl}</div>`).join('')}
+      <div style="height:1px;background:#F0F2F7;margin:10px 0"></div>
+      <div style="font-size:11px;font-weight:700;color:#8A8FA8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">👉 Objectifs</div>
+      ${planObjectifs[type].map(o=>`<div style="display:flex;align-items:flex-start;gap:7px;font-size:11.5px;color:#4A4A6A;line-height:1.5;margin-bottom:5px"><span style="color:${packColors[type]};font-weight:700;flex-shrink:0">—</span>${o}</div>`).join('')}
+      <div style="margin-top:10px;background:${packBg[type]};border-radius:10px;padding:9px 12px;font-size:11.5px;color:${packColors[type]};font-weight:600">
+        👉 Pour corriger efficacement ces déséquilibres, nous vous recommandons une approche ciblée :
+        <div style="font-size:12px;font-weight:800;margin-top:4px">🔬 Protocole adapté à votre profil</div>
+      </div>
+    </div>`;
+
+  /* 7. Produit */
+  renderProductCard(gReco);
+
+  /* ══ SLIDE 4 ══ Recommandations cliniques ══ */
+  const recsByType={
+    combined:[
+      {i:'🔬',t:'Rééquilibrage digestif & microbiote'},
+      {i:'🧘',t:'Régulation neuro-endocrinienne'},
+      {i:'⚡',t:'Activation métabolique ciblée'},
+      {i:'💊',t:'Soutien micronutritionnel personnalisé'}
+    ],
+    isole:[
+      {i:'🎯',t:`Correction prioritaire : ${p1Label||'Axe principal'}`},
+      {i:'🔬',t:'Régulation neuro-endocrinienne'},
+      {i:'😴',t:'Optimisation du sommeil et récupération'},
+      {i:'🌿',t:'Techniques de régulation adaptées'}
+    ],
+    homogene:[
+      {i:'✅',t:'Activation métabolique de maintien'},
+      {i:'🔋',t:'Optimisation de l\'énergie globale'},
+      {i:'🧘',t:'Régulation neuro-endocrinienne préventive'},
+      {i:'💊',t:'Suivi micronutritionnel personnalisé'}
+    ]
+  };
+  document.getElementById('rec-list').innerHTML=recsByType[type].map(r=>`<div class="rec-item"><div class="rec-ic">${r.i}</div>${r.t}</div>`).join('');
+
+  drawRadar(gScores);curSlide=0;updateSlideNav();show('s-results');
+}
+
+function renderProductCard(reco){
+  const key=getProductKey(reco);
+  const prod=PRODUCTS[key];
+  if(!prod)return;
+  const slot=document.getElementById('product-card-slot');
+  if(!slot)return;
+  slot.innerHTML=`
+    <div class="prod-card">
+      <div class="prod-header">
+        <div class="prod-emoji-wrap" style="background:${prod.bg}">${prod.emoji}</div>
+        <div class="prod-meta">
+          <div class="prod-cat" style="color:${prod.color}">${prod.cat}</div>
+          <div class="prod-name">${prod.name}</div>
+          ${prod.isPack?`<div class="prod-pack-badge">⭐ Solution Premium</div>`:''}
+        </div>
+      </div>
+      <div class="prod-headline" style="color:${prod.color}">${prod.headline}</div>
+      <div class="prod-divider"></div>
+      <div class="prod-benefits">
+        ${prod.benefits.map(b=>`
+          <div class="prod-benefit">
+            <div class="prod-check" style="background:${prod.color}">✓</div>
+            ${b}
+          </div>`).join('')}
+      </div>
+      <div class="prod-ingredients"><strong>Formule :</strong> ${prod.ingredients}</div>
+      <div class="prod-cta">
+        <button class="prod-cta-btn" style="background:${prod.color};color:#fff" onclick="alert('Redirection vers la boutique…')">
+          👉 ${prod.cta}
+        </button>
+      </div>
+    </div>`;
+}
+
+function drawRadar(scores){
+  const canvas=document.getElementById('radarChart');if(!canvas)return;
+  const sz=200,cx=100,cy=100,r=76,n=5,labels=['Inflam.','Stress','Métabo.','Énergie','Psycho'];
+  const ang=Array.from({length:n},(_,i)=>Math.PI*2/n*i-Math.PI/2);
+  const c=canvas.getContext('2d');c.clearRect(0,0,sz,sz);
+  [.25,.5,.75,1].forEach(t=>{c.beginPath();ang.forEach((a,i)=>{const x=cx+Math.cos(a)*r*t,y=cy+Math.sin(a)*r*t;i?c.lineTo(x,y):c.moveTo(x,y);});c.closePath();c.strokeStyle='#E8EAF0';c.lineWidth=1;c.stroke();});
+  ang.forEach(a=>{c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);c.strokeStyle='#E8EAF0';c.lineWidth=1;c.stroke();});
+  c.beginPath();scores.forEach((s,i)=>{const t=s/18,x=cx+Math.cos(ang[i])*r*t,y=cy+Math.sin(ang[i])*r*t;i?c.lineTo(x,y):c.moveTo(x,y);});c.closePath();c.fillStyle='rgba(61,125,90,.15)';c.fill();c.strokeStyle='#3D7D5A';c.lineWidth=2.5;c.stroke();
+  scores.forEach((s,i)=>{const t=s/18,x=cx+Math.cos(ang[i])*r*t,y=cy+Math.sin(ang[i])*r*t;c.beginPath();c.arc(x,y,3.5,0,Math.PI*2);c.fillStyle=gCol(s);c.fill();});
+  c.font='10px Arial,sans-serif';c.fillStyle='#8A8FA8';c.textAlign='center';
+  ang.forEach((a,i)=>{const x=cx+Math.cos(a)*(r+13),y=cy+Math.sin(a)*(r+13)+3;c.fillText(labels[i],x,y);});
+}
+
+function goSlide(dir){jumpSlide(curSlide+dir);}
+function jumpSlide(idx){if(idx<0||idx>3)return;curSlide=idx;document.getElementById('slides-track').style.transform=`translateX(-${idx*100}%)`;updateSlideNav();}
+function updateSlideNav(){document.getElementById('btn-prev-slide').disabled=curSlide===0;const nb=document.getElementById('btn-next-slide');nb.disabled=curSlide===3;nb.textContent=curSlide===3?'Terminé ✓':'Suivant →';document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===curSlide));}
+function sendEmail(){const inp=document.getElementById('email-in');if(!inp.value||!inp.value.includes('@')){inp.style.borderColor='#E24B4A';setTimeout(()=>inp.style.borderColor='',1500);return;}document.getElementById('email-row').style.display='none';document.getElementById('email-ok').style.display='block';}
+
+async function downloadPDF(){
+  if(!gScores.length)return;
+  const overlay=document.getElementById('pdf-overlay'),msg=document.getElementById('pdf-msg');
+  overlay.classList.add('active');msg.textContent='Préparation du contenu...';
+  const type=gReco.profile,p=PROFILES[type];
+  const total=gScores.reduce((a,b)=>a+b,0),date=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const pBg={combined:'#FDEAEA',isole:'#FEF3E0',homogene:'#E8F4EF'}[type];
+  const pBrd={combined:'#F09595',isole:'#FAC775',homogene:'#A8DFC0'}[type];
+  const pZone={combined:'#E24B4A',isole:'#BA7517',homogene:'#3D7D5A'}[type];
+  const pTxt={combined:'#791F1F',isole:'#633806',homogene:'#085041'}[type];
+  const scoresRows=AXES.map((a,i)=>{const s=gScores[i],c=gCol(s),pct=Math.round(s/18*100);const lvlKey=getAxeLvlKey(s);const txt=AXE_TEXTS[a.key][lvlKey];return `<tr><td style="padding:5px 0;font-size:12px;font-weight:700;width:160px;vertical-align:top">${a.icon} ${a.name}</td><td style="padding:5px 8px;vertical-align:top"><div style="background:#E8EAF0;border-radius:4px;height:7px;overflow:hidden;margin-bottom:4px"><div style="background:${c};width:${pct}%;height:100%;border-radius:4px"></div></div><div style="font-size:10.5px;color:#4A4A6A;line-height:1.5">${txt.title} — ${txt.cta}</div></td><td style="padding:5px 0;font-size:12px;font-weight:800;color:${c};text-align:right;width:40px;vertical-align:top">${s}/18</td></tr>`;}).join('');
+  const recsHTML=[{i:'🥗',t:'Ajustement nutritionnel ciblé'},{i:'🏃',t:"Programme d'activité physique adapté"},{i:'🧘',t:'Gestion du stress et récupération'},{i:'💊',t:'Soutien micronutritionnel'}].map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F0F2F7"><span style="font-size:14px">${r.i}</span><span style="font-size:12.5px;color:#4A4A6A">${r.t}</span></div>`).join('');
+  const descClean=p.desc.replace(/\n+/g,' ');
+  const html=`<div id="pdf-content" style="width:532px;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#1C1C2E">
+    <div style="border-bottom:2px solid #3D7D5A;padding-bottom:12px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end">
+      <div><div style="font-size:22px;font-weight:900;margin-bottom:2px">Votre Bilan de Santé</div><div style="font-size:12px;color:#8A8FA8;font-style:italic">Rapport personnalisé — ${date}</div></div>
+      <div style="text-align:right"><div style="font-size:12px;font-weight:800;color:#3D7D5A">Prime Health Clinic</div><div style="font-size:10px;color:#8A8FA8">Approche systémique &amp; bioénergétique</div></div>
+    </div>
+    <div style="display:flex;gap:14px;margin-bottom:16px">
+      <div style="flex:1;background:#F8F9FC;border-radius:10px;padding:13px">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:7px">Introduction</div>
+        <div style="font-size:12px;color:#4A4A6A;line-height:1.65;margin-bottom:7px">Ce rapport évalue votre santé à partir de <b>5 axes fondamentaux</b> :</div>
+        ${AXES.map(a=>`<div style="font-size:11.5px;color:#4A4A6A;margin-bottom:3px;display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${a.color};flex-shrink:0"></span>${a.name}</div>`).join('')}
+      </div>
+      <div style="flex:1;background:#F8F9FC;border-radius:10px;padding:13px">
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:7px">Scores par axe</div>
+        ${AXES.map((a,i)=>{const s=gScores[i],c=gCol(s);return `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;font-weight:600"><span>${a.name.split('/')[0].trim()}</span><span style="color:${c};font-weight:800">${s}/18</span></div>`;}).join('')}
+        <div style="border-top:1.5px solid #E8EAF0;margin-top:7px;padding-top:7px;display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:800;color:#3D7D5A">Score global</span><span style="font-size:13px;font-weight:900;color:#3D7D5A">${total}/90</span></div>
+      </div>
+    </div>
+    <div style="background:${pBg};border:1.5px solid ${pBrd};border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:8px">Votre profil physiologique</div>
+      <div style="font-size:17px;font-weight:900;color:${pTxt};margin-bottom:2px">${p.badge}</div>
+      <div style="font-size:11.5px;color:${pTxt};font-weight:600;margin-bottom:8px">${p.sub}</div>
+      <div style="font-size:12px;color:${pTxt};line-height:1.7;margin-bottom:10px">${descClean}</div>
+      ${p.checks.map(c=>`<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:12px;font-weight:700;color:${pTxt}"><span style="width:14px;height:14px;border-radius:50%;background:${pTxt};color:#fff;font-size:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">✓</span>${c}</div>`).join('')}
+      <div style="background:${pZone};color:#fff;border-radius:8px;padding:8px 11px;font-size:11.5px;font-weight:700;margin-top:8px">${p.zone} — ${p.zoneText}</div>
+    </div>
+    <div style="background:#F8F9FC;border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:10px">Analyse détaillée par axe</div>
+      <table style="width:100%;border-collapse:collapse">${scoresRows}</table>
+    </div>
+    <div style="background:#F8F9FC;border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:8px">🎯 Que faire maintenant ?</div>
+      <div style="font-size:12px;color:#4A4A6A;line-height:1.65;margin-bottom:10px">${gReco.message.replace(/\n/g,' ')}</div>
+      <div style="background:${pZone};color:#fff;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:800">${gReco.pack} 📦</div>
+    </div>
+    <div style="background:#F8F9FC;border-radius:10px;padding:14px;margin-bottom:20px">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8A8FA8;margin-bottom:8px">Recommandations</div>${recsHTML}
+    </div>
+    <div style="text-align:center;padding:12px 0 0;border-top:1px solid #E8EAF0">
+      <div style="font-size:13px;font-weight:800;color:#3D7D5A;margin-bottom:2px">Prime Health Clinic</div>
+      <div style="font-size:10px;color:#8A8FA8;font-style:italic">Approche systémique &amp; bioénergétique de la santé</div>
+    </div>
+  </div>`;
+  const container=document.getElementById('pdf-container');
+  container.innerHTML=html;container.style.visibility='visible';container.style.height='auto';container.style.overflow='visible';
+  msg.textContent='Rendu en cours...';await new Promise(r=>setTimeout(r,500));msg.textContent='Génération du PDF...';
+  try{
+    await html2pdf().set({margin:[12,10,12,10],filename:'Bilan_Sante_Prime_Health.pdf',image:{type:'jpeg',quality:0.97},html2canvas:{scale:2,useCORS:true,logging:true,backgroundColor:'#ffffff',allowTaint:false,foreignObjectRendering:false},jsPDF:{unit:'mm',format:'a4',orientation:'portrait',compress:true},pagebreak:{mode:['avoid-all','css','legacy']}}).from(container.querySelector('#pdf-content')).save();
+    msg.textContent='✓ PDF téléchargé !';
+    setTimeout(()=>{overlay.classList.remove('active');container.style.visibility='hidden';container.innerHTML='';},1200);
+  }catch(err){console.error(err);msg.textContent='Erreur. Réessayez.';setTimeout(()=>{overlay.classList.remove('active');container.style.visibility='hidden';},2000);}
+}
+function restart(){
+  answers=new Array(30).fill(null);cur=0;gScores=[];curSlide=0;gReco={};
+  document.getElementById('email-row').style.display='';document.getElementById('email-ok').style.display='none';document.getElementById('email-in').value='';
+  document.querySelectorAll('.an-step').forEach(s=>s.classList.remove('done'));
+  show('s-land');
+}
+
+/* ═══════════════════════════════════════════════════════
+   SYSTÈME DE SUIVI QUOTIDIEN — VERSION 2
+   100% localStorage · zéro serveur · mobile-first
+═══════════════════════════════════════════════════════ */
+
+const CHECK_AXES=[
+  {key:'energie',  label:'Énergie',   icon:'🔋', color:'#3A7DC9'},
+  {key:'stress',   label:'Stress',    icon:'🧠', color:'#7B4FCF'},
+  {key:'digestion',label:'Digestion', icon:'🫁', color:'#E8680A'},
+  {key:'sommeil',  label:'Sommeil',   icon:'😴', color:'#1A8C6E'},
+  {key:'humeur',   label:'Humeur',    icon:'💚', color:'#C0424A'}
+];
+// 1 = très bien, 5 = très mauvais (inversé pour l'affichage)
+const EMOJI_SCORES=['','😄','🙂','😐','😕','😞'];
+const SCORE_LABELS=['','Très bien','Bien','Moyen','Mauvais','Très mauvais'];
+
+let checkValues={};
+
+/* ── Persistence localStorage ── */
+function lsGet(k){try{return JSON.parse(localStorage.getItem('phc_'+k));}catch{return null;}}
+function lsSet(k,v){try{localStorage.setItem('phc_'+k,JSON.stringify(v));}catch{}}
+
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function getHistory(){return lsGet('history')||[];}
+function saveCheck(score,axes){
+  const hist=getHistory();
+  // Replace today's check if exists, else push
+  const ti=hist.findIndex(h=>h.date===todayKey());
+  if(ti>=0)hist[ti]={date:todayKey(),score,axes};
+  else hist.push({date:todayKey(),score,axes});
+  if(hist.length>90)hist.splice(0,hist.length-90);
+  lsSet('history',hist);
+}
+function hasCheckedToday(){return getHistory().some(h=>h.date===todayKey());}
+function getUserName(){return lsGet('name')||'';}
+function setUserName(n){lsSet('name',n);}
+function getProtocol(){return lsGet('protocol')||'Mon protocole';}
+function setProtocol(p){lsSet('protocol',p);}
+function getPriority(){return lsGet('priority')||null;}
+function setPriority(p){lsSet('priority',p);}
+function getOnboardDone(){return lsGet('onboard')||false;}
+function setOnboardDone(){lsSet('onboard',true);}
+function getStreak(){
+  const hist=getHistory();if(!hist.length)return 0;
+  let streak=0;const now=new Date();
+  for(let i=0;i<30;i++){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const k=d.toISOString().slice(0,10);
+    if(hist.some(h=>h.date===k))streak++;
+    else if(i>0)break;
+  }
+  return streak;
+}
+
+/* ── Onboarding ── */
+function validateOnboarding(skip){
+  const inp=document.getElementById('onboard-name-in');
+  if(!skip&&inp&&inp.value.trim())setUserName(inp.value.trim());
+  setOnboardDone();
+  goToCheck();
+}
+
+/* ── Flow entry ── */
+function startSuiviFlow(){
+  if(!getOnboardDone())show('s-onboarding');
+  else goToCheck();
+}
+
+function goToCheckFromDash(){
+  if(hasCheckedToday()){
+    // Already checked — show score again
+    const hist=getHistory();
+    const today=hist[hist.length-1];
+    renderScoreScreen(today.score);
+    show('s-score');
+  } else {
+    goToCheck();
+  }
+}
+
+function goToCheck(){
+  renderCheckScreen();
+  show('s-check');
+}
+
+/* ── Render check screen ── */
+function renderCheckScreen(){
+  checkValues={};
+  const today=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  const el=document.getElementById('check-date-label');
+  if(el)el.textContent=today.charAt(0).toUpperCase()+today.slice(1);
+  updateCheckProgress();
+
+  const list=document.getElementById('check-axes-list');
+  if(!list)return;
+  list.innerHTML=CHECK_AXES.map(ax=>`
+    <div class="check-axe-row">
+      <div class="check-axe-header">
+        <div class="check-axe-label">${ax.icon} ${ax.label}</div>
+        <span class="check-axe-val-badge" id="badge-${ax.key}">—</span>
+      </div>
+      <div class="check-btns" id="btns-${ax.key}">
+        ${[1,2,3,4,5].map(v=>`
+          <button class="check-btn" data-v="${v}"
+            onclick="selectCheckVal('${ax.key}',${v})">
+            ${EMOJI_SCORES[v]}
+          </button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function updateCheckProgress(){
+  const filled=CHECK_AXES.filter(a=>checkValues[a.key]!==undefined).length;
+  const pct=Math.round(filled/CHECK_AXES.length*100);
+  const fill=document.getElementById('check-prog-fill');
+  if(fill)fill.style.width=pct+'%';
+  const cnt=document.getElementById('check-filled-count');
+  if(cnt)cnt.textContent=filled+' / '+CHECK_AXES.length;
+  const vbtn=document.getElementById('btn-validate-check');
+  const allFilled=filled===CHECK_AXES.length;
+  if(vbtn){vbtn.style.opacity=allFilled?'1':'0.35';vbtn.style.pointerEvents=allFilled?'all':'none';}
+}
+
+function selectCheckVal(key,val){
+  checkValues[key]=val;
+  const container=document.getElementById('btns-'+key);
+  if(container){
+    container.querySelectorAll('.check-btn').forEach(b=>{
+      const bv=parseInt(b.dataset.v);
+      b.classList.toggle('active',bv===val);
+    });
+  }
+  // Update badge
+  const badge=document.getElementById('badge-'+key);
+  if(badge){
+    badge.textContent=EMOJI_SCORES[val]+' '+SCORE_LABELS[val];
+    const cols=['','#4CAF78','#8BC4A8','#C07C1A','#E8680A','#C13030'];
+    const bgs=['','#E8F4EF','#EEF7F2','#FEF3E0','#FEF0E6','#FDEAEA'];
+    badge.style.color=cols[val];badge.style.background=bgs[val];
+  }
+  updateCheckProgress();
+}
+
+function validateCheck(){
+  if(CHECK_AXES.some(a=>checkValues[a.key]===undefined))return;
+  // score global inversé : 1=bien → 100, 5=mauvais → 0
+  // On mappe: valeur 1→5, 2→4, 3→3, 4→2, 5→1 pour compatibilité display
+  const inverted={};
+  CHECK_AXES.forEach(a=>{inverted[a.key]=6-checkValues[a.key];});
+  const avg=CHECK_AXES.reduce((s,a)=>s+inverted[a.key],0)/5;
+  const score=Math.round(avg*20);
+  saveCheck(score,{...checkValues});
+  renderScoreScreen(score);
+  show('s-score');
+}
+
+/* ── Score screen V2 ── */
+function renderScoreScreen(score){
+  const arc=document.getElementById('score-arc');
+  const circumference=427;
+  const col=score>=70?'#3D7D5A':score>=50?'#C07C1A':'#C13030';
+  if(arc){
+    arc.style.strokeDashoffset=circumference;arc.style.stroke=col;
+    setTimeout(()=>{arc.style.strokeDashoffset=circumference-(circumference*score/100);},80);
+  }
+  const bigEl=document.getElementById('score-big');
+  if(bigEl){
+    bigEl.style.color=col;
+    let n=0;const step=Math.ceil(score/28);
+    const iv=setInterval(()=>{n=Math.min(n+step,score);bigEl.textContent=n;if(n>=score)clearInterval(iv);},28);
+  }
+
+  const hist=getHistory();
+  const deltaEl=document.getElementById('score-delta');
+  if(deltaEl&&hist.length>=2){
+    const prev=hist.length>=2&&hist[hist.length-1].date===todayKey()?hist[hist.length-2]:hist[hist.length-1];
+    const d=score-(prev?.score||score);
+    deltaEl.textContent=d>0?`↑ +${d} pts depuis hier`:d<0?`↓ ${d} pts depuis hier`:'= Stable';
+    deltaEl.style.color=d>0?'#3D7D5A':d<0?'#C13030':'#8A8FA8';
+  } else if(deltaEl){deltaEl.textContent='🎉 Premier check enregistré !';}
+
+  // Feedback intelligent (tendance sur 3 derniers)
+  const fb=document.getElementById('score-feedback');
+  if(fb){
+    let fbData;
+    const last3=hist.slice(-3).map(h=>h.score);
+    const hasTrend=last3.length>=2;
+    if(hasTrend){
+      const trend=last3[last3.length-1]-(last3[0]||score);
+      if(score>=70&&trend>=0)fbData={cls:'success',icon:'✅',text:'Excellent ! Votre organisme répond bien. Continuez votre protocole.'};
+      else if(trend>5)fbData={cls:'success',icon:'📈',text:'Belle progression ! Continuez sur cette lancée.'};
+      else if(trend<-5)fbData={cls:'danger',icon:'⚠️',text:'Votre état se dégrade. Consultez votre protocole et ajustez si nécessaire.'};
+      else if(score>=50)fbData={cls:'warning',icon:'➡️',text:'Progression stable. Un ajustement peut accélérer vos résultats.'};
+      else fbData={cls:'danger',icon:'🔴',text:'Score faible. Il est recommandé d\'agir rapidement sur votre protocole.'};
+    } else {
+      fbData=score>=70
+        ?{cls:'success',icon:'🌿',text:'Bon départ ! Revenez demain pour suivre votre évolution.'}
+        :{cls:'info',icon:'📊',text:'Check enregistré. Continuez quotidiennement pour voir votre progression.'};
+    }
+    fb.className='score-feedback-box tip-card '+fbData.cls;
+    fb.innerHTML=`<strong>${fbData.icon} ${fbData.text}</strong>`;
+  }
+
+  // Axes grid avec barres de progression
+  const grid=document.getElementById('score-axes-grid');
+  if(grid){
+    const latestCheck=hist.find(h=>h.date===todayKey())||hist[hist.length-1];
+    const prev=hist.length>=2?(hist[hist.length-1].date===todayKey()?hist[hist.length-2]:null):null;
+    grid.innerHTML=CHECK_AXES.map(ax=>{
+      const rawVal=latestCheck?.axes?.[ax.key]||checkValues[ax.key]||3;
+      const invVal=6-rawVal; // inversion pour affichage (1=bien)
+      const prevRaw=prev?.axes?.[ax.key];
+      const prevInv=prevRaw!==undefined?6-prevRaw:undefined;
+      const trend=prevInv!==undefined?(invVal>prevInv?'↑':invVal<prevInv?'↓':'→'):'-';
+      const trendColor=trend==='↑'?'#3D7D5A':trend==='↓'?'#C13030':'#8A8FA8';
+      const pct=Math.round(invVal/5*100);
+      return `<div class="score-axis-card">
+        <div class="score-axis-bar-bg"></div>
+        <div class="score-axis-bar-fill" style="width:${pct}%;background:${ax.color}30"></div>
+        <div class="score-axis-name">${ax.icon} ${ax.label}</div>
+        <div class="score-axis-val" style="color:${ax.color}">${EMOJI_SCORES[rawVal]}</div>
+        <div class="score-axis-trend" style="color:${trendColor}">${trend} ${SCORE_LABELS[rawVal]}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ── Progression screen V2 ── */
+function renderProgressionScreen(){
+  const hist=getHistory();
+
+  // Stats rapides
+  const statsEl=document.getElementById('prog-stats-row');
+  if(statsEl){
+    const total=hist.length;
+    const streak=getStreak();
+    const avg=total>0?Math.round(hist.reduce((s,h)=>s+h.score,0)/total):0;
+    const best=total>0?Math.max(...hist.map(h=>h.score)):0;
+    statsEl.innerHTML=[
+      {v:total,l:'Checks totaux',icon:'📋'},
+      {v:streak+'j',l:'Série en cours',icon:'🔥'},
+      {v:avg,l:'Score moyen',icon:'📊'},
+      {v:best,l:'Meilleur score',icon:'🏆'}
+    ].map(s=>`<div class="prog-stat-card">
+      <div style="font-size:16px;margin-bottom:2px">${s.icon}</div>
+      <div class="prog-stat-val">${s.v}</div>
+      <div class="prog-stat-lbl">${s.l}</div>
+    </div>`).join('');
+  }
+
+  // Bar chart
+  const canvas=document.getElementById('prog-chart');
+  if(canvas&&hist.length>0){
+    const ctx=canvas.getContext('2d');
+    canvas.width=canvas.offsetWidth*2;canvas.height=200;
+    ctx.scale(2,2);
+    const W=canvas.offsetWidth/2,H=100;
+    const last=hist.slice(-7);
+    const barW=Math.floor((W-20)/Math.max(last.length,1));
+    ctx.clearRect(0,0,W,H);
+    // Grid lines
+    [25,50,75].forEach(y=>{
+      const yp=H-14-Math.round(y/100*(H-24));
+      ctx.strokeStyle='#F0F2F7';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(10,yp);ctx.lineTo(W-10,yp);ctx.stroke();
+      ctx.fillStyle='#D0D4E0';ctx.font='8px Nunito,sans-serif';ctx.textAlign='left';
+      ctx.fillText(y,2,yp+3);
+    });
+    last.forEach((h,i)=>{
+      const x=10+i*barW+barW*0.15;const bw=barW*0.7;
+      const bh=Math.max(3,Math.round((h.score/100)*(H-24)));
+      const col=h.score>=70?'#3D7D5A':h.score>=50?'#C07C1A':'#C13030';
+      ctx.fillStyle=col+'22';ctx.beginPath();ctx.roundRect(x,H-14-bh,bw,bh,4);ctx.fill();
+      ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(x,H-14-bh,bw,5,2);ctx.fill();
+      ctx.fillStyle=col;ctx.font='bold 9px Nunito,sans-serif';ctx.textAlign='center';
+      if(bh>16)ctx.fillText(h.score,x+bw/2,H-17-bh);
+      else ctx.fillText(h.score,x+bw/2,H-18-bh);
+    });
+  } else if(canvas){
+    const ctx=canvas.getContext('2d');
+    canvas.width=canvas.offsetWidth*2;canvas.height=160;
+    ctx.scale(2,2);
+    ctx.fillStyle='#8A8FA8';ctx.font='12px Nunito,sans-serif';ctx.textAlign='center';
+    ctx.fillText('Aucun check enregistré pour le moment.',canvas.offsetWidth/2,40);
+  }
+
+  // Week labels
+  const weeksEl=document.getElementById('prog-weeks');
+  if(weeksEl&&hist.length>0){
+    const last=hist.slice(-7);
+    weeksEl.innerHTML=last.map(h=>{
+      const d=new Date(h.date+'T12:00:00');
+      const lbl=d.toLocaleDateString('fr-FR',{weekday:'short'});
+      const isToday=h.date===todayKey();
+      return `<span style="font-weight:${isToday?'800':'600'};color:${isToday?'#3D7D5A':'#8A8FA8'}">${lbl}</span>`;
+    }).join('');
+  }
+
+  // Axes évolution
+  const axesEl=document.getElementById('prog-axes');
+  if(axesEl&&hist.length>=2){
+    const latest=hist[hist.length-1];const prev=hist[hist.length-2];
+    axesEl.innerHTML=CHECK_AXES.map(ax=>{
+      const rawV=latest.axes?.[ax.key]||3;
+      const rawP=prev.axes?.[ax.key]||3;
+      const v=6-rawV;const p=6-rawP; // inversion
+      const diff=v-p;
+      const trend=diff>0?`↑ +${diff}`:(diff<0?`↓ ${diff}`:'→ Stable');
+      const trendCol=diff>0?'#3D7D5A':diff<0?'#C13030':'#8A8FA8';
+      const pct=Math.round(v/5*100);
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:16px;width:22px;flex-shrink:0">${ax.icon}</span>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:11.5px;font-weight:700;color:#1C1C2E">${ax.label}</span>
+            <span style="font-size:10.5px;font-weight:700;color:${trendCol};background:${trendCol}15;padding:1px 7px;border-radius:10px">${trend}</span>
+          </div>
+          <div style="height:6px;background:#F0F2F7;border-radius:3px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${ax.color};border-radius:3px;transition:width .6s ease"></div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:${ax.color};min-width:28px;text-align:right">${EMOJI_SCORES[rawV]}</div>
+      </div>`;
+    }).join('');
+  } else if(axesEl){
+    axesEl.innerHTML='<div style="font-size:12px;color:#8A8FA8;text-align:center;padding:12px 0">Faites au moins 2 checks pour voir l\'évolution par axe.</div>';
+  }
+
+  // Tip / conseil
+  const tipEl=document.getElementById('prog-tip');
+  if(tipEl&&hist.length>=3){
+    const last5=hist.slice(-5);
+    const avg=Math.round(last5.reduce((s,h)=>s+h.score,0)/last5.length);
+    const trend=last5[last5.length-1].score-last5[0].score;
+    let tip;
+    if(trend>10)tip={cls:'success',icon:'🚀',text:`Progression remarquable sur les ${last5.length} derniers jours. Continuez ainsi !`};
+    else if(trend<-10)tip={cls:'danger',icon:'⚠️',text:'Votre score baisse. Revoyez votre protocole ou refaites un bilan complet.'};
+    else if(avg>=70)tip={cls:'success',icon:'✅',text:'Vous maintenez un bon niveau. L\'optimisation est votre objectif.'};
+    else tip={cls:'warning',icon:'💡',text:'Score stable. Identifiez l\'axe le plus problématique et ajustez votre protocole.'};
+    tipEl.className='rcard tip-card '+tip.cls;
+    tipEl.innerHTML=`<strong>${tip.icon} ${tip.text}</strong>`;
+  } else if(tipEl){tipEl.innerHTML='';}
+
+  // Réévaluation
+  const reevalEl=document.getElementById('reeval-block');
+  if(reevalEl){
+    reevalEl.style.display='none';
+    if(hist.length>=3){
+      const last5=hist.slice(-5).map(h=>h.score);
+      const variance=Math.max(...last5)-Math.min(...last5);
+      const daysSince=Math.floor((Date.now()-new Date(hist[0].date+'T12:00:00').getTime())/(864e5));
+      if(daysSince>=30||variance<=4)reevalEl.style.display='block';
+    }
+  }
+
+  // Protocole
+  const protEl=document.getElementById('protocole-label');
+  if(protEl)protEl.textContent=getProtocol();
+}
+
+/* ── Dashboard V2 ── */
+function renderDashboard(){
+  const hist=getHistory();
+  const name=getUserName();
+  const greet=document.getElementById('dash-greeting');
+  if(greet)greet.textContent=(name?`Bonjour ${name} 👋`:'Bonjour 👋');
+  const dateEl=document.getElementById('dash-date');
+  if(dateEl){const d=new Date();dateEl.textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}
+
+  // Streak badge
+  const streakBadge=document.getElementById('dash-streak-badge');
+  const streak=getStreak();
+  if(streakBadge&&streak>=2)streakBadge.innerHTML=`<span class="streak-badge">🔥 ${streak} jours</span>`;
+  else if(streakBadge)streakBadge.innerHTML='';
+
+  // Score du jour
+  const checkedToday=hasCheckedToday();
+  const todayEntry=checkedToday?hist[hist.length-1]:null;
+  const scoreEl=document.getElementById('dash-score-big');
+  const deltaEl=document.getElementById('dash-score-delta');
+  const cardEl=document.getElementById('dash-score-card');
+
+  if(todayEntry&&scoreEl){
+    const s=todayEntry.score;
+    const col=s>=70?'#3D7D5A':s>=50?'#C07C1A':'#C13030';
+    scoreEl.textContent=s;
+    scoreEl.style.color=col;
+    if(cardEl)cardEl.style.borderColor=col+'40';
+    if(deltaEl&&hist.length>=2){
+      const d=s-hist[hist.length-2].score;
+      deltaEl.textContent=d>0?`↑ +${d} pts depuis hier`:d<0?`↓ ${Math.abs(d)} pts depuis hier`:'= Stable depuis hier';
+      deltaEl.style.color=d>0?'#3D7D5A':d<0?'#C13030':'#8A8FA8';
+    }
+    // Already done badge
+    const doneBadge=document.getElementById('done-today-badge');
+    if(doneBadge)doneBadge.innerHTML=`<div class="done-today-badge"><span>✅</span> Check du jour effectué</div>`;
+  } else if(scoreEl){
+    scoreEl.textContent='—';
+    scoreEl.style.color='#1C1C2E';
+    if(deltaEl){deltaEl.textContent='Check non effectué aujourd\'hui';deltaEl.style.color='#8A8FA8';}
+    const doneBadge=document.getElementById('done-today-badge');
+    if(doneBadge)doneBadge.innerHTML='';
+  }
+
+  // Mini sparkline
+  drawSparkline(hist);
+
+  // Bouton check adaptatif
+  const checkBtn=document.getElementById('dash-check-btn');
+  const checkLabel=document.getElementById('dash-check-label');
+  const checkSub=document.getElementById('dash-check-sub');
+  const checkIcon=document.getElementById('dash-check-icon');
+  if(checkedToday){
+    if(checkLabel)checkLabel.textContent='Revoir mon score du jour';
+    if(checkSub)checkSub.textContent='Check déjà effectué · Modifier';
+    if(checkIcon)checkIcon.textContent='📊';
+    if(checkBtn)checkBtn.style.background='#2D6045';
+  } else {
+    if(checkLabel)checkLabel.textContent='Faire mon check';
+    if(checkSub)checkSub.textContent='10 secondes · 5 axes';
+    if(checkIcon)checkIcon.textContent='⚡';
+    if(checkBtn)checkBtn.style.background='#3D7D5A';
+  }
+
+  // Objectif
+  const objEl=document.getElementById('dash-objectif');
+  if(objEl){
+    const prio=getPriority();
+    objEl.innerHTML=prio
+      ?`Améliorer votre <strong>${prio}</strong> et stabiliser votre équilibre global.`
+      :'Maintenir et optimiser votre équilibre physiologique global.';
+  }
+
+  // Axe focus
+  const focusEl=document.getElementById('dash-focus-content');
+  if(focusEl&&todayEntry){
+    // Worst axe (highest raw = worst)
+    const worst=CHECK_AXES.reduce((w,ax)=>(!w||todayEntry.axes[ax.key]>todayEntry.axes[w.key])?ax:w,null);
+    if(worst){
+      const rawV=todayEntry.axes[worst.key]||3;
+      focusEl.innerHTML=`<div style="display:flex;align-items:center;gap:12px;background:${worst.color}10;border-radius:14px;padding:12px 13px">
+        <span style="font-size:26px">${worst.icon}</span>
+        <div>
+          <div style="font-size:12.5px;font-weight:700;color:${worst.color}">${worst.label} — ${SCORE_LABELS[rawV]}</div>
+          <div style="font-size:11px;color:#8A8FA8;margin-top:2px">Axe le plus difficile aujourd'hui ${EMOJI_SCORES[rawV]}</div>
+        </div>
+      </div>`;
+    }
+  } else if(focusEl){
+    focusEl.innerHTML='<div style="font-size:12px;color:#8A8FA8;line-height:1.65">Effectuez votre check quotidien pour identifier l\'axe sur lequel concentrer vos efforts.</div>';
+  }
+
+  // Conseil du jour (basé sur historique)
+  const tipEl=document.getElementById('dash-tip-card');
+  if(tipEl){
+    if(hist.length===0){
+      tipEl.className='rcard';
+      tipEl.innerHTML=`<div class="rcard-title">💡 Le saviez-vous ?</div><div style="font-size:12px;color:#4A4A6A;line-height:1.7">Un suivi quotidien de 10 secondes suffit à détecter des tendances significatives en quelques jours.</div>`;
+    } else if(!checkedToday){
+      tipEl.className='rcard tip-card warning';
+      tipEl.innerHTML=`<strong>⏰ Votre check du jour n'a pas encore été effectué. Prenez 10 secondes maintenant !</strong>`;
+    } else {tipEl.innerHTML='';}
+  }
+}
+
+function drawSparkline(hist){
+  const canvas=document.getElementById('dash-sparkline');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=140;canvas.height=72;
+  ctx.scale(2,2);
+  const W=70,H=36;
+  const last=hist.slice(-7);if(last.length<2){ctx.clearRect(0,0,W,H);return;}
+  const min=Math.min(...last.map(h=>h.score))-5;
+  const max=Math.max(...last.map(h=>h.score))+5;
+  const xStep=(W-8)/(last.length-1);
+  const toY=v=>H-4-Math.round(((v-min)/(max-min||1))*(H-8));
+  // Fill
+  ctx.beginPath();
+  last.forEach((h,i)=>{const x=4+i*xStep,y=toY(h.score);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.lineTo(4+(last.length-1)*xStep,H-4);ctx.lineTo(4,H-4);ctx.closePath();
+  ctx.fillStyle='rgba(61,125,90,.12)';ctx.fill();
+  // Line
+  ctx.beginPath();
+  last.forEach((h,i)=>{const x=4+i*xStep,y=toY(h.score);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.strokeStyle='#3D7D5A';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.stroke();
+  // Last dot
+  const lx=4+(last.length-1)*xStep,ly=toY(last[last.length-1].score);
+  ctx.beginPath();ctx.arc(lx,ly,2.5,0,Math.PI*2);ctx.fillStyle='#3D7D5A';ctx.fill();
+}
+
+/* ── Override show() to hook screens ── */
+const _origShow=show;
+function show(id){
+  const screens=['s-land','s-quiz','s-analyse','s-results',
+                 's-onboarding','s-suivi-entry','s-check','s-score','s-progression','s-dashboard'];
+  screens.forEach(s=>{const el=document.getElementById(s);if(el)el.classList.remove('active');});
+  const target=document.getElementById(id);
+  if(target)target.classList.add('active');
+  if(id==='s-dashboard')renderDashboard();
+  if(id==='s-progression')renderProgressionScreen();
+  if(id==='s-check')renderCheckScreen();
+}
+
+/* ── Inject "Suivi" CTA after product card in slide 3 ── */
+function injectSuiviCTA(){
+  const slot=document.getElementById('product-card-slot');
+  if(!slot)return;
+  const existing=document.getElementById('suivi-cta-inject');
+  if(existing)return;
+  const div=document.createElement('div');
+  div.id='suivi-cta-inject';
+  div.style.cssText='background:linear-gradient(135deg,#E8F4EF,#EEF0FE);border-radius:18px;padding:16px;margin-top:10px;text-align:center;border:1.5px solid #A8DFC0';
+  div.innerHTML=`
+    <div style="font-size:20px;margin-bottom:8px">📈</div>
+    <div style="font-size:13.5px;font-weight:800;color:#1C1C2E;margin-bottom:5px">Suivez votre évolution jour après jour</div>
+    <div style="font-size:11.5px;color:#8A8FA8;margin-bottom:12px;line-height:1.6">10 secondes par jour pour mesurer vos progrès et ajuster votre protocole.</div>
+    <button class="btn-suivi-start" onclick="initSuivi()" style="max-width:260px">Commencer mon suivi →</button>`;
+  slot.after(div);
+}
+
+function initSuivi(){
+  if(gReco&&gReco.pack)setProtocol(gReco.pack);
+  if(gReco&&gReco.priority1&&gReco.priority1.name!=='optimisation')setPriority(getAxeLabel(gReco.priority1.name));
+  show('s-suivi-entry');
+}
+
+/* ═══════════════════════════════════════════
+   MODULE 8 — RAPPELS QUOTIDIENS
+═══════════════════════════════════════════ */
+const RAPPEL_MESSAGES=[
+  'Faites votre check aujourd\'hui (10 sec)',
+  'Votre progression vous attend 📊',
+  'Votre score a évolué cette semaine',
+  'Prenez 10 secondes pour votre santé aujourd\'hui',
+  'N\'oubliez pas votre check quotidien !'
+];
+
+function getRappelEnabled(){return lsGet('rappel')!==false;}
+function toggleRappels(on){
+  lsSet('rappel',on);
+  if(on&&!hasCheckedToday())showRappelBanner();
+  else hideRappelBanner();
+}
+function showRappelBanner(){
+  const banner=document.getElementById('rappel-banner');
+  if(!banner||!getRappelEnabled())return;
+  const msgs=RAPPEL_MESSAGES;
+  const msg=msgs[Math.floor(Math.random()*msgs.length)];
+  const txt=document.getElementById('rappel-text');
+  if(txt)txt.textContent=msg;
+  banner.style.display='flex';
+}
+function hideRappelBanner(){
+  const banner=document.getElementById('rappel-banner');
+  if(banner)banner.style.display='none';
+}
+function dismissRappel(){
+  hideRappelBanner();
+  goToCheck();
+}
+// Auto-show rappel if not checked today and rappels enabled
+function checkRappel(){
+  if(!hasCheckedToday()&&getRappelEnabled()&&getHistory().length>0){
+    // Show after 2 seconds on dashboard
+    setTimeout(showRappelBanner,2000);
+  }
+}
+// Sync toggle state
+function syncRappelToggle(){
+  const tog=document.getElementById('rappel-toggle');
+  if(tog)tog.checked=getRappelEnabled();
+}
+
+/* ═══════════════════════════════════════════
+   MODULE 10 — CARTE PROTOCOLE ENRICHIE
+═══════════════════════════════════════════ */
+function renderProtocoleCard(){
+  const wrap=document.getElementById('protocole-card-wrap');
+  if(!wrap)return;
+  const protocol=getProtocol();
+  const priority=getPriority();
+  const hist=getHistory();
+  const checks=hist.length;
+  // Progress score: average of last 7 checks vs initial
+  let progress=0;
+  if(hist.length>=2){
+    const first=hist.slice(0,3).reduce((s,h)=>s+h.score,0)/Math.min(3,hist.length);
+    const last=hist.slice(-3).reduce((s,h)=>s+h.score,0)/Math.min(3,hist.length);
+    progress=Math.min(100,Math.max(0,Math.round((last-first)/first*100+50)));
+  } else {progress=checks>0?35:0;}
+  const objectives=priority
+    ?[`Améliorer votre ${priority}`,`Stabiliser votre équilibre global`,`Optimiser votre récupération`]
+    :['Maintenir l\'équilibre physiologique','Optimiser votre énergie','Protéger votre santé long terme'];
+  wrap.innerHTML=`<div class="protocole-card">
+    <div class="protocole-card-label">🔬 Protocole en cours</div>
+    <div class="protocole-card-name">${protocol}</div>
+    <div class="protocole-card-objectives">
+      ${objectives.map(o=>`<div class="protocole-card-obj"><div class="protocole-card-obj-dot"></div>${o}</div>`).join('')}
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:5px;font-weight:600">Progression estimée</div>
+    <div class="protocole-progress-wrap">
+      <div class="protocole-progress-fill" style="width:${progress}%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <div style="font-size:10.5px;color:rgba(255,255,255,.6)">${checks} check${checks>1?'s':''} enregistré${checks>1?'s':''}</div>
+      <div style="font-size:10.5px;color:#7FD9A8;font-weight:700">${progress}% en progression</div>
+    </div>
+    <button onclick="show('s-check')" style="margin-top:12px;width:100%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:50px;padding:11px;font-family:'Nunito',sans-serif;font-size:12.5px;font-weight:700;color:#fff;cursor:pointer;touch-action:manipulation">⚡ Faire mon check aujourd'hui</button>
+  </div>`;
+}
+
+/* ── Dashboard : mini protocole link ── */
+function renderDashProtocoleMini(){
+  const el=document.getElementById('dash-protocole-mini');
+  if(!el)return;
+  const protocol=getProtocol();
+  const priority=getPriority();
+  el.innerHTML=`<div class="rcard">
+    <div class="rcard-title">🔬 Votre protocole en cours</div>
+    <div style="font-size:13px;color:#3D7D5A;font-weight:700;margin-bottom:5px">${protocol}</div>
+    ${priority?`<div style="font-size:11.5px;color:#4A4A6A;line-height:1.6;margin-bottom:10px">Objectif : <strong>améliorer ${priority}</strong><br>Continuez pour maximiser vos résultats.</div>`
+    :`<div style="font-size:11.5px;color:#4A4A6A;line-height:1.6;margin-bottom:10px">Continuez votre protocole pour maximiser vos résultats.</div>`}
+    <button class="btn-suivi-secondary" style="width:100%" onclick="show('s-progression')">📈 Voir ma progression complète</button>
+  </div>`;
+}
+
+/* ── Override renderDashboard + renderProgressionScreen to include V3 modules ── */
+const _origRenderDashboard=renderDashboard;
+function renderDashboard(){
+  _origRenderDashboard();
+  renderDashProtocoleMini();
+  checkRappel();
+}
+const _origRenderProgression=renderProgressionScreen;
+function renderProgressionScreen(){
+  _origRenderProgression();
+  renderProtocoleCard();
+  syncRappelToggle();
+}
+
+/* ── Init on load ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Show rappel after short delay if on dashboard
+  setTimeout(()=>{
+    const dash=document.getElementById('s-dashboard');
+    if(dash&&dash.classList.contains('active'))checkRappel();
+  },3000);
+});
+// ════════════════════════════════════════
+// ÉTAT GLOBAL DU SUIVI
+// ════════════════════════════════════════
+
+const checkScores = { energie:0, stress:0, digestion:0, sommeil:0, humeur:0 };
+const axesRemplis = { energie:false, stress:false, digestion:false, sommeil:false, humeur:false };
+
+// ════════════════════════════════════════
+// NAVIGATION : Résultats → Dashboard
+// ════════════════════════════════════════
+
+/**
+ * Appelez cette fonction sur le bouton
+ * "Commencer mon suivi" de votre section Résultats.
+ * Exemple : onclick="demarrerSuivi()"
+ */
+function demarrerSuivi() {
+  document.getElementById('s-results').style.display = 'none'; // adaptez l'id à votre code
+  afficherDashboard();
+}
+
+function afficherDashboard() {
+  cacherTout();
+  const dash = document.getElementById('s-dashboard');
+  dash.style.display = 'block';
+
+  // Date du jour
+  const today = new Date();
+  document.getElementById('dash-date').textContent =
+    today.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+
+  // Salutation
+  document.getElementById('dash-greeting').textContent = 'Bonjour 👋';
+
+  // Score du jour si déjà enregistré
+  const dernierScore = chargerDernierScore();
+  if (dernierScore !== null) {
+    afficherScoreDashboard(dernierScore);
+  }
+
+  // Objectif depuis le bilan (à adapter selon votre variable existante)
+  if (typeof gReco !== 'undefined' && gReco.priority1) {
+    document.getElementById('dash-objectif').textContent =
+      'Améliorer votre ' + gReco.priority1.name;
+  }
+}
+
+function afficherCheck() {
+  cacherTout();
+  const check = document.getElementById('s-check');
+  check.style.display = 'block';
+
+  // Date
+  const today = new Date();
+  document.getElementById('check-date').textContent =
+    today.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+
+  // Reset des boutons
+  document.querySelectorAll('.btn-group button').forEach(b => {
+    b.style.background = '';
+    b.style.color = '';
+  });
+
+  // Reset état
+  Object.keys(axesRemplis).forEach(k => axesRemplis[k] = false);
+  Object.keys(checkScores).forEach(k => checkScores[k] = 0);
+  document.getElementById('btn-valider-check').disabled = true;
+  document.getElementById('btn-valider-check').style.opacity = '0.4';
+}
+
+function afficherProgression() {
+  // Branchez ici votre écran progression si vous l'avez
+  alert('Écran progression — à connecter.');
+}
+
+function refaireBilan() {
+  cacherTout();
+  // Remplacez 's-quiz' par l'id de votre section quiz
+  document.getElementById('s-quiz').style.display = 'block';
+}
+
+function cacherTout() {
+  ['s-results', 's-check', 's-dashboard'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+// ════════════════════════════════════════
+// MODULE 2 : SÉLECTION DES SCORES
+// ════════════════════════════════════════
+
+function selectScore(axe, valeur, bouton) {
+  // Met à jour l'état
+  checkScores[axe] = valeur;
+  axesRemplis[axe] = true;
+
+  // Réinitialise les boutons du groupe
+  const groupe = bouton.parentElement;
+  groupe.querySelectorAll('button').forEach(b => {
+    b.style.background = '#f0f0f0';
+    b.style.color = '#333';
+    b.style.fontWeight = 'normal';
+  });
+
+  // Met en évidence le bouton sélectionné
+  bouton.style.background = '#3D7D5A';
+  bouton.style.color = '#fff';
+  bouton.style.fontWeight = '700';
+
+  // Active le bouton valider si tous les axes sont remplis
+  const tousRemplis = Object.values(axesRemplis).every(v => v === true);
+  const btnValider = document.getElementById('btn-valider-check');
+  if (tousRemplis) {
+    btnValider.disabled = false;
+    btnValider.style.opacity = '1';
+  }
+}
+
+// ════════════════════════════════════════
+// CALCUL DU SCORE GLOBAL (spec PDF)
+// score = moyenne des 5 axes × 20
+// ════════════════════════════════════════
+
+function calculerScoreGlobal() {
+  const axes = Object.values(checkScores);        // [3, 2, 4, 5, 1]
+  const somme = axes.reduce((acc, v) => acc + v, 0); // 15
+  const moyenne = somme / axes.length;            // 3.0
+  const score = Math.round(moyenne * 20);         // 60
+  return score;
+}
+
+// ════════════════════════════════════════
+// VALIDATION DU CHECK + FEEDBACK
+// ════════════════════════════════════════
+
+function validerCheck() {
+  const score = calculerScoreGlobal();
+
+  // Sauvegarde locale
+  sauvegarderScore(score);
+
+  // Retour au dashboard avec le score
+  afficherDashboard();
+  afficherScoreDashboard(score);
+}
+
+function afficherScoreDashboard(score) {
+  // Affiche le score
+  document.getElementById('dash-score').textContent = score;
+
+  // Couleur selon niveau
+  const couleur = score >= 70 ? '#3D7D5A' : score >= 50 ? '#C07C1A' : '#C13030';
+  document.getElementById('dash-score').style.color = couleur;
+
+  // Delta vs score précédent
+  const historique = chargerHistorique();
+  if (historique.length >= 2) {
+    const precedent = historique[historique.length - 2].score;
+    const delta = score - precedent;
+    const deltaEl = document.getElementById('dash-delta');
+    if (delta > 0) {
+      deltaEl.textContent = '↑ +' + delta + ' depuis hier';
+      deltaEl.style.color = '#3D7D5A';
+    } else if (delta < 0) {
+      deltaEl.textContent = '↓ ' + delta + ' depuis hier';
+      deltaEl.style.color = '#C13030';
+    } else {
+      deltaEl.textContent = '= Stable';
+      deltaEl.style.color = '#888';
+    }
+  }
+
+  // Feedback intelligent (spec PDF Module 5)
+  const feedbackEl = document.getElementById('dash-feedback');
+  feedbackEl.style.display = 'block';
+  const historiqueFiltré = chargerHistorique();
+
+  if (historiqueFiltré.length >= 2) {
+    const derniersScores = historiqueFiltré.slice(-3).map(h => h.score);
+    const tendance = derniersScores[derniersScores.length - 1] - derniersScores[0];
+
+    if (tendance > 3) {
+      // Amélioration
+      feedbackEl.style.background = '#e8f4ef';
+      feedbackEl.style.color = '#3D7D5A';
+      feedbackEl.textContent = '✅ Votre organisme répond positivement. Continuez votre protocole actuel.';
+    } else if (tendance < -3) {
+      // Dégradation
+      feedbackEl.style.background = '#fdeaea';
+      feedbackEl.style.color = '#C13030';
+      feedbackEl.textContent = '⚠️ Votre état semble se dégrader. Il est recommandé d\'agir rapidement.';
+    } else {
+      // Stagnation
+      feedbackEl.style.background = '#fef3e0';
+      feedbackEl.style.color = '#C07C1A';
+      feedbackEl.textContent = '⚠️ Votre progression est limitée. Un ajustement pourrait être nécessaire.';
+    }
+  } else {
+    feedbackEl.style.background = '#eef0fe';
+    feedbackEl.style.color = '#3C3489';
+    feedbackEl.textContent = '📊 Premier enregistrement. Revenez demain pour suivre votre évolution.';
+  }
+}
+
+// ════════════════════════════════════════
+// PERSISTANCE LOCALE (localStorage)
+// ════════════════════════════════════════
+
+function sauvegarderScore(score) {
+  const historique = chargerHistorique();
+  const entree = {
+    date: new Date().toISOString().slice(0, 10),
+    score: score,
+    axes: { ...checkScores }
+  };
+  // Remplace si même date
+  const idx = historique.findIndex(h => h.date === entree.date);
+  if (idx >= 0) {
+    historique[idx] = entree;
+  } else {
+    historique.push(entree);
+  }
+  localStorage.setItem('phc_historique', JSON.stringify(historique));
+}
+
+function chargerHistorique() {
+  try {
+    return JSON.parse(localStorage.getItem('phc_historique')) || [];
+  } catch {
+    return [];
+  }
+}
+
+function chargerDernierScore() {
+  const h = chargerHistorique();
+  if (!h.length) return null;
+  const aujourd_hui = new Date().toISOString().slice(0, 10);
+  const entree = h.find(x => x.date === aujourd_hui);
+  return entree ? entree.score : null;
+}
+</script>
+</body>
+</html>
