@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Prime Health Clinic</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',system-ui,sans-serif;background:#F0F2F7}
+.phone{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;bottom:env(safe-area-inset-bottom,0);background:#F0F2F7;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:520px){
+  body{display:flex;align-items:center;justify-content:center;overflow:auto;height:auto;min-height:100vh;padding:24px 0}
+  .phone{position:relative;top:auto;left:auto;right:auto;bottom:auto;width:390px;height:min(760px,calc(100vh - 48px));border-radius:40px;box-shadow:0 24px 64px rgba(0,0,0,.14)}
+}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:#F0F2F7}
+.screen.active{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
+.pad{padding:12px;display:flex;flex-direction:column;gap:10px}
+
+/* ── NAV ── */
+.nav{display:flex;background:#fff;border-top:.5px solid #ECEEF4;padding:6px 0 10px;flex-shrink:0;z-index:10}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:5px 2px;font-family:inherit;position:relative}
+.ni-ic{font-size:20px;line-height:1;transition:transform .15s}
+.ni-lb{font-size:10px;font-weight:700;color:#B0B4C8;letter-spacing:.01em;transition:color .15s}
+.ni.on .ni-lb{color:#0F6E56}
+.ni.on .ni-ic{transform:scale(1.1)}
+.ndot{position:absolute;top:3px;right:calc(50% - 18px);width:7px;height:7px;border-radius:50%;background:#E24B4A;border:1.5px solid #F0F2F7;display:none}
+.ndot.show{display:block}
+
+/* ── CARDS ── */
+.card{background:#fff;border-radius:16px;padding:13px;border:.5px solid #ECEEF4}
+.clbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#B0B4C8;margin-bottom:9px}
+
+/* ── BUTTONS ── */
+.bpri{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#0F6E56;color:#E1F5EE;border:none;border-radius:999px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;touch-action:manipulation}
+.bpri:active{opacity:.85}
+.bghost{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 14px;background:none;color:#1C1C2E;border:.5px solid #DCDEE8;border-radius:999px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;touch-action:manipulation}
+.brow{display:flex;gap:8px}
+.brow .bpri,.brow .bghost{flex:1}
+
+/* ── FEEDBACK ── */
+.fb{border-left:3px solid;padding:10px 12px;font-size:12px;font-weight:700;line-height:1.6;border-radius:0 10px 10px 0}
+.fb.ok{background:#E1F5EE;color:#04342C;border-color:#1D9E75}
+.fb.warn{background:#FAEEDA;color:#412402;border-color:#EF9F27}
+.fb.bad{background:#FCEBEB;color:#501313;border-color:#E24B4A}
+.fb.info{background:#E6F1FB;color:#042C53;border-color:#378ADD}
+
+/* ═══════════════════════
+   LANDING
+═══════════════════════ */
+#s-land{background:#fff;justify-content:space-between;align-items:center}
+.land-bg{width:100%;height:210px;background:#F0F2F7;border-radius:0 0 50% 50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.land-content{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center;padding:12px 28px}
+.land-title{font-size:23px;font-weight:800;color:#1C1C2E;line-height:1.25;margin-bottom:10px}
+.land-desc{font-size:13px;color:#8A8FA8;line-height:1.65;margin-bottom:4px}
+.land-dur{font-size:13px;color:#8A8FA8;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:6px;color:#B0B4C8;font-size:12px;font-weight:700;padding-bottom:12px;justify-content:center;flex-shrink:0}
+.blogo{width:20px;height:20px;border-radius:50%;background:#0F6E56;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.blogo svg{width:11px;height:11px}
+
+/* ═══════════════════════
+   QUIZ
+═══════════════════════ */
+#s-quiz{background:#F0F2F7}
+.qtop{background:#fff;padding:13px 16px 10px;flex-shrink:0}
+.qhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.qlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.qcnt{font-size:11px;color:#B0B4C8;font-weight:700}
+.qbar{height:3px;background:#ECEEF4;border-radius:2px;overflow:hidden}
+.qfill{height:100%;border-radius:2px;transition:width .4s}
+.qcard{background:#fff;margin:10px 10px 0;border-radius:22px;padding:14px;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:fadeUp .22s ease both}
+.qcard::-webkit-scrollbar{display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.qicc{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 9px}
+.qnm{text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.qtx{text-align:center;font-size:15px;font-weight:800;color:#1C1C2E;line-height:1.35;margin-bottom:3px}
+.qsb{text-align:center;font-size:11px;color:#8A8FA8;line-height:1.5;margin-bottom:12px}
+.alist{display:flex;flex-direction:column;gap:7px}
+.apill{border:1.5px solid #ECEEF4;border-radius:12px;padding:10px 13px;cursor:pointer;font-family:inherit;font-size:13px;color:#1C1C2E;font-weight:600;background:#fff;text-align:left;transition:all .15s;width:100%;touch-action:manipulation}
+.apill.s0{background:#FCEBEB;border-color:#F09595;color:#501313}
+.apill.s1{background:#FAEEDA;border-color:#FAC775;color:#412402}
+.apill.s2{background:#E1F5EE;border-color:#5DCAA5;color:#04342C}
+.apill.s3{background:#EEEDFE;border-color:#AFA9EC;color:#26215C}
+.qfoot{flex-shrink:0;padding:5px 10px 10px}
+.qmini{text-align:center;font-size:10px;color:#B0B4C8;font-weight:700;padding:3px 0}
+.qnav{display:flex;justify-content:space-between;align-items:center}
+.bprv{background:#fff;border:.5px solid #DCDEE8;border-radius:999px;padding:9px 16px;font-family:inherit;font-size:12px;font-weight:700;color:#8A8FA8;cursor:pointer}
+.bnxt{border:none;border-radius:999px;padding:9px 20px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;opacity:.3;pointer-events:none;touch-action:manipulation}
+.bnxt.ok{opacity:1;pointer-events:all}
+
+/* ═══════════════════════
+   ANALYSE
+═══════════════════════ */
+#s-analyse{background:#F0F2F7}
+.an-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 20px;gap:8px}
+.spin{width:52px;height:52px;border:3px solid #ECEEF4;border-top:3px solid #0F6E56;border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.an-step{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:9px 13px;font-size:12px;color:#8A8FA8;font-weight:700;transition:all .3s;text-align:left;width:100%}
+.an-step.done{color:#0F6E56}
+.an-dot{width:17px;height:17px;border-radius:50%;border:2px solid #ECEEF4;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;transition:all .3s}
+.an-step.done .an-dot{background:#0F6E56;border-color:#0F6E56;color:#fff}
+
+/* ═══════════════════════
+   RÉSULTATS
+═══════════════════════ */
+#s-results{background:#F0F2F7}
+.rtop{background:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:.5px solid #ECEEF4}
+.rlogo{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:#0F6E56}
+.bredo{background:#F0F2F7;border:none;border-radius:999px;padding:6px 12px;font-family:inherit;font-size:11px;font-weight:700;color:#8A8FA8;cursor:pointer}
+.svp{flex:1;min-height:0;overflow:hidden;position:relative}
+.strk{display:flex;height:100%;transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.slid{min-width:100%;height:100%;overflow-y:auto;padding:10px 11px 8px;-webkit-overflow-scrolling:touch}
+.slid::-webkit-scrollbar{display:none}
+.snav{flex-shrink:0;background:#fff;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;border-top:.5px solid #ECEEF4}
+.bsl{border:none;border-radius:999px;padding:9px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation}
+.bsl.p{background:#F0F2F7;color:#8A8FA8}
+.bsl.n{background:#0F6E56;color:#E1F5EE}
+.bsl:disabled{opacity:.3;pointer-events:none}
+.ddts{display:flex;gap:5px;align-items:center}
+.ddt{width:7px;height:7px;border-radius:50%;background:#ECEEF4;cursor:pointer;transition:all .2s}
+.ddt.on{background:#0F6E56;width:20px;border-radius:4px}
+.rc{background:#fff;border-radius:18px;padding:13px;margin-bottom:9px}
+.rc:last-child{margin-bottom:0}
+.rct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#B0B4C8;margin-bottom:8px}
+.sdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:.5px solid #F0F2F7}
+.sdr:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sbi{height:6px;background:#F0F2F7;border-radius:3px;overflow:hidden;margin-bottom:2px}
+.sbf{height:100%;border-radius:3px}
+.lb{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px}
+.lf{background:#E1F5EE;color:#04342C}
+.lm{background:#FAEEDA;color:#412402}
+.le{background:#FCEBEB;color:#501313}
+.pc{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:9px;border:.5px solid #ECEEF4}
+.ph{padding:13px 13px 9px;display:flex;align-items:flex-start;gap:9px}
+.pew{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.pname{font-size:13px;font-weight:800;color:#1C1C2E;line-height:1.2}
+.pcat{font-size:9.5px;font-weight:700;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+.pbf{display:flex;align-items:flex-start;gap:6px;font-size:11.5px;color:#4A4A6A;margin-bottom:5px;line-height:1.45}
+.pck{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0;margin-top:1px}
+.ei{flex:1;border:1.5px solid #ECEEF4;border-radius:11px;padding:9px 12px;font-family:inherit;font-size:13px;color:#1C1C2E;background:#F8F9FC;outline:none}
+.ei:focus{border-color:#0F6E56;background:#fff}
+
+/* ═══════════════════════
+   ONBOARDING
+═══════════════════════ */
+#s-onboarding{background:#fff}
+.ob-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;text-align:center}
+.ob-emoji{font-size:52px;margin-bottom:16px}
+.ob-title{font-size:22px;font-weight:800;color:#1C1C2E;line-height:1.3;margin-bottom:10px}
+.ob-sub{font-size:13.5px;color:#8A8FA8;line-height:1.7;margin-bottom:26px}
+.ob-in{width:100%;border:2px solid #ECEEF4;border-radius:16px;padding:13px 16px;font-family:inherit;font-size:16px;color:#1C1C2E;background:#F8F9FC;outline:none;transition:border .2s;text-align:center}
+.ob-in:focus{border-color:#0F6E56;background:#fff}
+.ob-skip{background:none;border:none;font-family:inherit;font-size:12.5px;color:#B0B4C8;cursor:pointer;padding:10px;margin-top:4px}
+
+/* ═══════════════════════
+   DASHBOARD
+═══════════════════════ */
+#s-dash{background:#F0F2F7}
+.dhdr{background:linear-gradient(135deg,#0F6E56,#084D3C);padding:16px 18px 20px;flex-shrink:0}
+.dgreet{font-size:17px;font-weight:800;color:#fff}
+.ddate{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.scard{background:#fff;border-radius:18px;padding:15px;border:.5px solid #ECEEF4}
+.snum{font-size:54px;font-weight:900;line-height:1;letter-spacing:-2px}
+.sdelta{font-size:12.5px;font-weight:700;margin-top:5px}
+.donebar{display:flex;align-items:center;gap:7px;background:#E1F5EE;border-radius:9px;padding:8px 11px;margin-top:11px;font-size:12px;font-weight:700;color:#04342C}
+.focrow{display:flex;align-items:center;gap:11px;border-radius:12px;padding:11px 12px}
+
+/* ═══════════════════════
+   CHECK
+═══════════════════════ */
+#s-check{background:#F0F2F7}
+.chdr{background:#fff;padding:13px 14px 10px;flex-shrink:0;border-bottom:.5px solid #ECEEF4}
+.cpbar{height:3px;background:#ECEEF4;border-radius:2px;overflow:hidden;margin-top:8px}
+.cpfill{height:100%;background:#0F6E56;border-radius:2px;transition:width .3s}
+.axrow{background:#fff;border-radius:16px;padding:12px}
+.axtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.axnm{font-size:13px;font-weight:700;color:#1C1C2E;display:flex;align-items:center;gap:7px}
+.axic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.vbadge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#F0F2F7;color:#B0B4C8;transition:all .18s;white-space:nowrap}
+.b5{display:flex;gap:5px}
+.sb{flex:1;border:1.5px solid #ECEEF4;border-radius:9px;padding:9px 2px;font-size:19px;line-height:1;background:#fff;cursor:pointer;transition:all .18s;touch-action:manipulation;font-family:inherit}
+.sb:active{transform:scale(.91)}
+.sb.on{transform:scale(1.06);box-shadow:0 0 0 2px currentColor}
+.sb[data-v="1"].on{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.sb[data-v="2"].on{background:#EAF3DE;border-color:#639922;color:#3B6D11}
+.sb[data-v="3"].on{background:#FAEEDA;border-color:#EF9F27;color:#854F0B}
+.sb[data-v="4"].on{background:#FAECE7;border-color:#D85A30;color:#712B13}
+.sb[data-v="5"].on{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+
+/* Score result */
+.cirwrap{display:flex;justify-content:center;align-items:center;position:relative;height:158px;flex-shrink:0}
+.cirinn{position:absolute;text-align:center}
+.cirsco{font-size:44px;font-weight:900;line-height:1;letter-spacing:-1px}
+.cirsub{font-size:13px;color:#B0B4C8;font-weight:700}
+.axgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.axmini{background:#fff;border-radius:10px;border:.5px solid #ECEEF4;padding:10px;position:relative;overflow:hidden}
+.axmbar{position:absolute;bottom:0;left:0;right:0;height:2px;background:#ECEEF4}
+.axmfill{position:absolute;bottom:0;left:0;height:2px;border-radius:0 2px 0 0;transition:width .7s}
+.axmlbl{font-size:10px;color:#B0B4C8;margin-bottom:3px}
+.axmval{font-size:19px;line-height:1;margin-bottom:2px}
+.axmtrend{font-size:10.5px;font-weight:700}
+
+/* ═══════════════════════
+   PROGRESSION
+═══════════════════════ */
+#s-prog{background:#F0F2F7}
+.phdr{background:#fff;padding:13px 16px 11px;flex-shrink:0;border-bottom:.5px solid #ECEEF4}
+.stgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.stbox{background:#fff;border-radius:12px;padding:11px 6px;text-align:center;border:.5px solid #ECEEF4}
+.stval{font-size:20px;font-weight:900;color:#1C1C2E}
+.stlbl{font-size:9.5px;color:#B0B4C8;font-weight:700;margin-top:2px;text-transform:uppercase}
+.aevo{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:.5px solid #F0F2F7}
+.aevo:last-child{border-bottom:none;padding-bottom:0}
+.ebt{height:6px;background:#F0F2F7;border-radius:3px;overflow:hidden;flex:1}
+.ebf{height:100%;border-radius:3px;transition:width .6s}
+.tpill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.tpu{background:#E1F5EE;color:#0F6E56}
+.tpd{background:#FCEBEB;color:#A32D2D}
+.tpe{background:#F0F2F7;color:#8A8FA8}
+
+/* Protocole dark */
+.proto-dark{background:linear-gradient(135deg,#1C1C2E,#2A354A);border-radius:16px;padding:15px}
+
+/* Premium */
+.prem-block{background:linear-gradient(135deg,#EEEDFE,#FBEAF0);border-radius:16px;padding:15px;border:1.5px solid #AFA9EC}
+
+/* Suivi CTA (dans slide résultats) */
+.suivi-cta{background:linear-gradient(135deg,#E1F5EE,#EEEDFE);border-radius:16px;padding:15px;border:1.5px solid #9FE1CB;text-align:center;margin-bottom:9px}
+
+@keyframes au{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.au{animation:au .2s ease both}
+.au1{animation-delay:.03s}.au2{animation-delay:.07s}.au3{animation-delay:.11s}.au4{animation-delay:.15s}.au5{animation-delay:.19s}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ═══ LANDING ═══ -->
+<div class="screen active" id="s-land">
+  <div class="land-bg">
+    <svg width="88" height="88" viewBox="0 0 100 100" fill="none">
+      <ellipse cx="50" cy="52" rx="34" ry="30" fill="#F7C4BC" opacity=".3"/>
+      <path d="M28 45C26 38 30 30 38 28c4-2 8-1 10 2 2-3 6-4 10-2 8 2 12 10 10 17 3 3 4 8 2 12-2 6-8 9-14 8-2 3-6 5-10 3-4 2-8 0-10-3-6-1-12-4-14-10-2-5 0-9 6-10z" fill="#F4A89A"/>
+      <path d="M48 30v36" stroke="#E8756A" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+      <path d="M32 38c2-2 5-2 6 0M62 38c1-2 4-2 5 0M30 50c2-4 6-6 10-4M60 46c4-2 8 0 10 4" stroke="#E8756A" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>
+    </svg>
+  </div>
+  <div class="land-content">
+    <div class="land-title">Évaluez votre<br>équilibre physiologique</div>
+    <div class="land-desc">Ce scan analyse 5 axes fondamentaux<br>de votre santé.</div>
+    <div class="land-dur">Durée : 2 minutes.</div>
+    <button class="bpri" onclick="startQuiz()" style="max-width:240px">Commencer l'évaluation →</button>
+  </div>
+  <div class="brand">
+    <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+    Prime Health Clinic
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div class="screen" id="s-quiz">
+  <div class="qtop">
+    <div class="qhdr">
+      <span class="qlbl" id="axe-lbl">Étape 1 / 5</span>
+      <span class="qcnt" id="q-cnt">Q 1 / 30</span>
+    </div>
+    <div class="qbar"><div class="qfill" id="pfill" style="width:0%"></div></div>
+  </div>
+  <div class="qcard" id="quiz-card">
+    <div class="qicc" id="axe-icon-c"></div>
+    <div class="qnm" id="q-nm"></div>
+    <div class="qtx" id="q-tx"></div>
+    <div class="qsb" id="q-sb"></div>
+    <div class="alist" id="ans-list"></div>
+  </div>
+  <div class="qfoot">
+    <div class="qmini" id="axe-sc-mini">Score axe 1 : 0 / 18</div>
+    <div class="qnav">
+      <button class="bprv" id="btn-prev" onclick="goBack()" style="visibility:hidden">← Retour</button>
+      <button class="bnxt" id="btn-nxt" onclick="goNext()">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ANALYSE ═══ -->
+<div class="screen" id="s-analyse">
+  <div class="an-wrap">
+    <div class="spin"></div>
+    <div style="font-size:17px;font-weight:800;color:#1C1C2E;margin-bottom:3px">Analyse en cours...</div>
+    <div style="font-size:12px;color:#8A8FA8;margin-bottom:14px">Calcul de votre profil physiologique</div>
+    <div style="display:flex;flex-direction:column;gap:6px;width:100%">
+      <div class="an-step" id="ast0"><div class="an-dot">✓</div>Inflammation / Digestif</div>
+      <div class="an-step" id="ast1"><div class="an-dot">✓</div>Stress neuro-endocrinien</div>
+      <div class="an-step" id="ast2"><div class="an-dot">✓</div>Axe métabolique</div>
+      <div class="an-step" id="ast3"><div class="an-dot">✓</div>Énergie &amp; Fatigue</div>
+      <div class="an-step" id="ast4"><div class="an-dot">✓</div>Psycho-émotionnel</div>
+    </div>
+    <div class="brand" style="margin-top:16px">
+      <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      Prime Health Clinic
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RÉSULTATS ═══ -->
+<div class="screen" id="s-results">
+  <div class="rtop">
+    <div class="rlogo"><div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>Vos résultats</div>
+    <button class="bredo" onclick="restart()">↺ Recommencer</button>
+  </div>
+  <div class="svp">
+    <div class="strk" id="slides-track">
+
+      <!-- Slide 1 : Profil + Radar + Tension + Priorités -->
+      <div class="slid">
+        <div id="profile-box"></div>
+        <div class="rc">
+          <div class="rct">📊 Vue d'ensemble</div>
+          <div style="display:flex;justify-content:center;margin-bottom:6px"><canvas id="radarChart" width="180" height="180"></canvas></div>
+          <div style="background:#E1F5EE;border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11.5px;font-weight:700;color:#04342C">Score global</span>
+            <span style="font-size:15px;font-weight:900;color:#04342C" id="total-num">— / 90</span>
+          </div>
+        </div>
+        <div id="tension-block"></div>
+        <div id="priorities-block"></div>
+      </div>
+
+      <!-- Slide 2 : Analyse par axe -->
+      <div class="slid">
+        <div class="rc">
+          <div class="rct">📈 Analyse détaillée par axe</div>
+          <div id="score-detail"></div>
+          <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#B0B4C8;font-weight:700"><div style="width:7px;height:7px;border-radius:50%;background:#1D9E75"></div>Faible 0–6</div>
+            <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#B0B4C8;font-weight:700"><div style="width:7px;height:7px;border-radius:50%;background:#EF9F27"></div>Moyen 7–12</div>
+            <div style="display:flex;align-items:center;gap:3px;font-size:10px;color:#B0B4C8;font-weight:700"><div style="width:7px;height:7px;border-radius:50%;background:#E24B4A"></div>Élevé 13–18</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3 : Plan + Produit + CTA Suivi -->
+      <div class="slid">
+        <div id="whatnow-block"></div>
+        <div id="plan-block"></div>
+        <div id="product-card-slot"></div>
+        <div class="suivi-cta">
+          <div style="font-size:20px;margin-bottom:7px">📈</div>
+          <div style="font-size:14px;font-weight:800;color:#1C1C2E;margin-bottom:5px">Suivez votre évolution</div>
+          <div style="font-size:11.5px;color:#8A8FA8;line-height:1.65;margin-bottom:13px">Pour améliorer votre santé durablement, il est essentiel de suivre votre progression.<br><strong style="color:#0F6E56">10 secondes par jour suffisent.</strong></div>
+          <button class="bpri" onclick="lancerSuivi()" style="max-width:240px;margin:0 auto">Commencer mon suivi →</button>
+        </div>
+      </div>
+
+      <!-- Slide 4 : Recommandations + Email -->
+      <div class="slid">
+        <div class="rc" style="margin-bottom:9px">
+          <div class="rct">✅ Recommandations cliniques</div>
+          <div id="rec-list"></div>
+        </div>
+        <div class="rc" style="margin-bottom:9px">
+          <div class="rct">✉️ Recevoir par email</div>
+          <div style="display:flex;gap:7px;margin-bottom:6px" id="email-row">
+            <input class="ei" type="email" id="email-in" placeholder="votre@email.com">
+            <button onclick="sendEmail()" style="background:#0F6E56;color:#E1F5EE;border:none;border-radius:11px;padding:9px 13px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Envoyer</button>
+          </div>
+          <div id="email-ok" style="display:none;background:#E1F5EE;border-radius:9px;padding:8px;font-size:12px;color:#04342C;font-weight:700;text-align:center;margin-bottom:6px">✓ Bilan envoyé !</div>
+          <div style="font-size:10px;color:#B0B4C8;text-align:center">Vos données restent confidentielles.</div>
+        </div>
+        <button class="bpri" onclick="lancerSuivi()">📈 Commencer mon suivi</button>
+      </div>
+
+    </div>
+  </div>
+  <div class="snav">
+    <button class="bsl p" id="bsl-prev" onclick="goSlide(-1)" disabled>← Précédent</button>
+    <div class="ddts" id="dots">
+      <div class="ddt on" onclick="jSlide(0)"></div>
+      <div class="ddt" onclick="jSlide(1)"></div>
+      <div class="ddt" onclick="jSlide(2)"></div>
+      <div class="ddt" onclick="jSlide(3)"></div>
+    </div>
+    <button class="bsl n" id="bsl-next" onclick="goSlide(1)">Suivant →</button>
+  </div>
+</div>
+
+<!-- ═══ ONBOARDING ═══ -->
+<div class="screen" id="s-onboarding">
+  <div class="ob-wrap">
+    <div class="ob-emoji">👋</div>
+    <div class="ob-title">Bienvenue dans<br>votre espace suivi</div>
+    <div class="ob-sub">Pour personnaliser votre expérience,<br>comment souhaitez-vous être appelé ?</div>
+    <input class="ob-in" id="ob-name" type="text" placeholder="Votre prénom" maxlength="24" autocomplete="given-name">
+    <div style="height:16px"></div>
+    <button class="bpri" onclick="validerOnboarding()" style="max-width:260px">C'est parti ! →</button>
+    <button class="ob-skip" onclick="validerOnboarding(true)">Passer cette étape</button>
+  </div>
+  <div class="brand" style="padding-bottom:14px">
+    <div class="blogo"><svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+    Prime Health Clinic
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="screen" id="s-dash">
+  <div class="dhdr">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div><div class="dgreet" id="dgreet">Bonjour 👋</div><div class="ddate" id="ddate"></div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="dstreak"></span>
+        <div class="blogo" style="width:30px;height:30px;cursor:pointer;flex-shrink:0" onclick="show('s-results')">
+          <svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#fff" stroke-width="1.5"/><path d="M5.5 3v5M3 5.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll"><div class="pad">
+    <div class="scard" id="dscard">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#B0B4C8;margin-bottom:7px">Score santé du jour</div>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <div class="snum" id="dsnum">—</div>
+        <div style="font-size:14px;color:#B0B4C8;font-weight:600" id="dsdenom"></div>
+      </div>
+      <div class="sdelta" id="dsdelta"></div>
+      <div id="dsdone"></div>
+    </div>
+    <div id="dcta"></div>
+    <div class="card">
+      <div class="clbl">Objectif prioritaire</div>
+      <div style="font-size:13px;color:#1C1C2E;line-height:1.65" id="dobj">Faites votre bilan pour obtenir votre objectif personnalisé.</div>
+    </div>
+    <div class="card">
+      <div class="clbl">Axe à travailler aujourd'hui</div>
+      <div id="dfocus"><div style="font-size:13px;color:#8A8FA8;line-height:1.6">Effectuez votre check pour identifier l'axe à travailler.</div></div>
+    </div>
+    <div id="dfeedback"></div>
+  </div></div>
+  <nav class="nav">
+    <button class="ni on" onclick="go('dash')"><div class="ni-ic">🏠</div><div class="ni-lb">Accueil</div></button>
+    <button class="ni" onclick="go('check')"><div class="ndot" id="ndot"></div><div class="ni-ic">⚡</div><div class="ni-lb">Mon check</div></button>
+    <button class="ni" onclick="go('prog')"><div class="ni-ic">📈</div><div class="ni-lb">Progression</div></button>
+    <button class="ni" onclick="show('s-results')"><div class="ni-ic">📋</div><div class="ni-lb">Mon bilan</div></button>
+  </nav>
+</div>
+
+<!-- ═══ CHECK ═══ -->
+<div class="screen" id="s-check">
+  <div class="chdr">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:16px;font-weight:800;color:#1C1C2E">Comment vous sentez-vous ?</div>
+      <span id="ccount" style="font-size:11px;font-weight:700;color:#B0B4C8;background:#F0F2F7;border-radius:999px;padding:3px 10px">0 / 5</span>
+    </div>
+    <div style="font-size:11px;color:#8A8FA8;margin-top:2px" id="cdate"></div>
+    <div class="cpbar"><div class="cpfill" id="cpfill" style="width:0%"></div></div>
+  </div>
+  <div id="cform" class="scroll"><div class="pad" style="gap:8px">
+    <div style="text-align:center;font-size:12px;color:#8A8FA8;padding:2px 0">😄 Très bien &nbsp;·&nbsp; 😞 Très mauvais</div>
+    <div id="caxes" style="display:flex;flex-direction:column;gap:8px"></div>
+    <button class="bpri" id="bval" onclick="valider()" style="opacity:.3;pointer-events:none">✓ Valider mon check</button>
+    <div style="text-align:center;font-size:11px;color:#B0B4C8">Données stockées uniquement sur votre appareil</div>
+  </div></div>
+  <div id="cresult" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+    <div class="scroll"><div class="pad">
+      <div class="cirwrap">
+        <svg width="156" height="156" viewBox="0 0 156 156">
+          <circle cx="78" cy="78" r="66" fill="none" stroke="#ECEEF4" stroke-width="10"/>
+          <circle id="sarc" cx="78" cy="78" r="66" fill="none" stroke="#1D9E75" stroke-width="10"
+            stroke-linecap="round" stroke-dasharray="415" stroke-dashoffset="415"
+            transform="rotate(-90 78 78)" style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="cirinn">
+          <div class="cirsco" id="cscore">—</div>
+          <div class="cirsub">/100</div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:13px;font-weight:700" id="cdelta"></div>
+      <div class="fb" id="cfb"></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#B0B4C8;margin-bottom:9px;margin-top:4px">Détail par axe</div>
+      <div class="axgrid" id="cgrid"></div>
+      <div class="brow">
+        <button class="bghost" onclick="go('prog')" style="flex:1">📈 Progression</button>
+        <button class="bpri" onclick="go('dash')" style="flex:1">Accueil</button>
+      </div>
+    </div></div>
+  </div>
+  <nav class="nav">
+    <button class="ni" onclick="go('dash')"><div class="ni-ic">🏠</div><div class="ni-lb">Accueil</div></button>
+    <button class="ni on"><div class="ni-ic">⚡</div><div class="ni-lb">Mon check</div></button>
+    <button class="ni" onclick="go('prog')"><div class="ni-ic">📈</div><div class="ni-lb">Progression</div></button>
+    <button class="ni" onclick="show('s-results')"><div class="ni-ic">📋</div><div class="ni-lb">Mon bilan</div></button>
+  </nav>
+</div>
+
+<!-- ═══ PROGRESSION ═══ -->
+<div class="screen" id="s-prog">
+  <div class="phdr">
+    <div style="font-size:17px;font-weight:800;color:#1C1C2E">Ma progression</div>
+    <div style="font-size:12px;color:#8A8FA8;margin-top:2px" id="psub">Évolution de vos 5 axes</div>
+  </div>
+  <div class="scroll"><div class="pad">
+    <div id="pempty" style="display:none;text-align:center;padding:32px 16px">
+      <div style="font-size:40px;margin-bottom:12px">📊</div>
+      <div style="font-size:15px;font-weight:800;color:#1C1C2E;margin-bottom:8px">Pas encore de données</div>
+      <div style="font-size:13px;color:#8A8FA8;line-height:1.65;margin-bottom:18px">Faites votre premier check quotidien pour commencer à suivre votre progression.</div>
+      <button class="bpri" style="max-width:200px;margin:0 auto" onclick="go('check')">⚡ Mon premier check</button>
+    </div>
+    <div id="pcontent">
+      <div class="stgrid" id="pstats" style="margin-bottom:10px"></div>
+      <div class="card">
+        <div class="clbl">Évolution — 7 derniers jours</div>
+        <canvas id="pchart" height="85" style="width:100%;display:block;margin:6px 0 4px"></canvas>
+        <div id="pwks" style="display:flex;justify-content:space-between;font-size:10px;color:#B0B4C8;font-weight:700"></div>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <div class="clbl">Évolution par axe</div>
+        <div id="paxes"></div>
+      </div>
+      <div id="ptip" style="margin-top:10px"></div>
+      <div class="rc" id="preeval" style="display:none;margin-top:10px;border-left:3px solid #EF9F27;border-radius:0 16px 16px 0">
+        <div style="font-size:13px;font-weight:700;color:#412402;margin-bottom:5px">🔄 Réévaluez votre profil</div>
+        <div style="font-size:12px;color:#8A8FA8;line-height:1.6;margin-bottom:10px">Votre état a évolué. Refaites votre bilan complet pour ajuster votre protocole.</div>
+        <button class="bghost" onclick="restart()">Refaire mon bilan</button>
+      </div>
+      <div id="pproto" style="margin-top:10px"></div>
+      <div class="prem-block" style="margin-top:10px">
+        <div style="display:inline-flex;align-items:center;gap:4px;background:#534AB7;color:#fff;border-radius:999px;padding:3px 10px;font-size:10px;font-weight:700;margin-bottom:8px">🔒 Premium</div>
+        <div style="font-size:13px;font-weight:800;color:#26215C;margin-bottom:6px">Débloquez l'analyse avancée</div>
+        <div style="font-size:11.5px;color:#3C3489;line-height:1.75;margin-bottom:11px">✦ Historique complet (90 jours)<br>✦ Recommandations évolutives<br>✦ Ajustement personnalisé de protocole<br>✦ Export PDF de progression mensuel</div>
+        <button class="bpri" style="background:#534AB7" onclick="alert('Bientôt disponible !')">Passer à Premium →</button>
+      </div>
+    </div>
+  </div></div>
+  <nav class="nav">
+    <button class="ni" onclick="go('dash')"><div class="ni-ic">🏠</div><div class="ni-lb">Accueil</div></button>
+    <button class="ni" onclick="go('check')"><div class="ni-ic">⚡</div><div class="ni-lb">Mon check</div></button>
+    <button class="ni on"><div class="ni-ic">📈</div><div class="ni-lb">Progression</div></button>
+    <button class="ni" onclick="show('s-results')"><div class="ni-ic">📋</div><div class="ni-lb">Mon bilan</div></button>
+  </nav>
+</div>
+
+</div><!-- /phone -->
+
+<script>
+/* ═══════════════════════════════════════
+   DONNÉES QUIZ
+═══════════════════════════════════════ */
+const AXES=[
+  {name:"Inflammation / Digestif",short:"Digestif",key:"digestif",color:"#993C1D",bg:"#FAECE7",icon:"🫁",
+   sub:"Comment se manifeste votre digestion au quotidien ?",
+   qs:["Ressentez-vous des ballonnements après les repas ?","Votre transit est-il irrégulier (constipation / diarrhée) ?","Ressentez-vous des douleurs abdominales ?","Êtes-vous fatigué après les repas ?","Avez-vous un brouillard mental ?","Êtes-vous sensible à certains aliments ?"]},
+  {name:"Stress (Neuro-endocrinien)",short:"Stress",key:"stress",color:"#534AB7",bg:"#EEEDFE",icon:"🧠",
+   sub:"Comment avez-vous ressenti votre niveau de stress ces derniers temps ?",
+   qs:["Avez-vous du mal à vous détendre ?","Ressentez-vous un stress constant ?","Vous réveillez-vous la nuit ?","Êtes-vous fatigué au réveil ?","Êtes-vous facilement irritable ?","Avez-vous des difficultés de concentration ?"]},
+  {name:"Métabolique",short:"Métabolisme",key:"metabolisme",color:"#0F6E56",bg:"#E1F5EE",icon:"⚡",
+   sub:"Comment évaluez-vous votre appétit et votre énergie après les repas ?",
+   qs:["Avez-vous des fringales sucrées ?","Ressentez-vous un coup de fatigue après les repas ?","Avez-vous des difficultés à perdre du poids ?","Stockez-vous facilement au niveau abdominal ?","Votre énergie est-elle instable dans la journée ?","Ressentez-vous des sensations d'hypoglycémie ?"]},
+  {name:"Énergie / Fatigue",short:"Énergie",key:"energie",color:"#185FA5",bg:"#E6F1FB",icon:"🔋",
+   sub:"Comment vous sentez-vous par rapport à votre niveau de forme physique ?",
+   qs:["Ressentez-vous une fatigue persistante ?","Avez-vous des difficultés à récupérer ?","Manquez-vous de motivation physique ?","Vous épuisez-vous rapidement ?","Avez-vous besoin de stimulants (café / sucre) ?","Ressentez-vous une baisse d'énergie dans la journée ?"]},
+  {name:"Psycho-émotionnel",short:"Psycho",key:"psycho",color:"#993556",bg:"#FBEAF0",icon:"💚",
+   sub:"Comment allez-vous psycho-émotionnellement ces derniers temps ?",
+   qs:["Ressentez-vous une perte de plaisir ?","Avez-vous une anxiété diffuse ?","Ressentez-vous une charge mentale élevée ?","Avez-vous des pensées envahissantes ?","Avez-vous une sensation de perte de contrôle ?","Votre humeur est-elle instable ?"]}
+];
+const ANS=["Jamais","Parfois","Souvent","Très souvent"];
+const SEL=["s0","s1","s2","s3"];
+let ans=new Array(30).fill(null),cur=0,gSc=[],cSlide=0,gReco={};
+
+/* ═══════════════════════════════════════
+   PRODUITS
+═══════════════════════════════════════ */
+const PRODS={
+  digestif:{e:"🫁",cat:"Digestif",name:"Digestive Reset Protocol",hl:"Réinitialisez votre système digestif et retrouvez votre énergie",col:"#993C1D",bg:"#FAECE7",ben:["Digestion plus légère et confort immédiat","Réduction des ballonnements","Regain d'énergie et meilleure assimilation"],ing:"Probiotiques multi-souches · L-glutamine · Enzymes digestives",cta:"Commencer mon reset digestif"},
+  stress:{e:"🧠",cat:"Stress & Nerveux",name:"Neuro Balance System",hl:"Calmez votre système nerveux et retrouvez un équilibre intérieur",col:"#534AB7",bg:"#EEEDFE",ben:["Réduction du stress et de l'anxiété","Sommeil amélioré et récupération","Esprit plus calme et focus retrouvé"],ing:"Magnésium bisglycinate · Ashwagandha · Rhodiola · Oméga 3",cta:"Rééquilibrer mon système nerveux"},
+  metabolisme:{e:"⚡",cat:"Métabolisme",name:"Metabolic Repair Stack",hl:"Stabilisez votre métabolisme et votre énergie",col:"#0F6E56",bg:"#E1F5EE",ben:["Énergie stable tout au long de la journée","Réduction des fringales sucrées","Meilleure gestion du poids"],ing:"Berbérine · Chrome · Fibres · Oméga 3",cta:"Relancer mon métabolisme"},
+  energie:{e:"🔋",cat:"Énergie & Vitalité",name:"Energy Recovery Formula",hl:"Rechargez votre énergie en profondeur",col:"#185FA5",bg:"#E6F1FB",ben:["Énergie durable sans coup de fatigue","Meilleure récupération physique","Regain de vitalité et motivation"],ing:"CoQ10 · Vitamines B · Fer biodisponible",cta:"Retrouver mon énergie"},
+  psycho:{e:"💚",cat:"Psycho-émotionnel",name:"Emotional Balance Protocol",hl:"Stabilisez votre équilibre émotionnel",col:"#993556",bg:"#FBEAF0",ben:["Apaisement mental et réduction de l'anxiété","Humeur stable et équilibrée","Meilleure gestion émotionnelle"],ing:"Safran · L-théanine · Magnésium · Oméga 3",cta:"Retrouver mon équilibre"},
+  combo_digestif_stress:{e:"🔥",cat:"Pack Premium",name:"Gut & Brain Reset",hl:"Rééquilibrez votre digestion et votre système nerveux",col:"#534AB7",bg:"#EEEDFE",ben:["Moins de stress et meilleure digestion","Énergie stable et récupération optimale","Action combinée axe intestin-cerveau"],ing:"Probiotiques · Magnésium · Ashwagandha · Enzymes · Oméga 3",cta:"Commencer mon reset global",pack:true},
+  optimisation:{e:"🌿",cat:"Optimisation",name:"Pack Optimisation",hl:"Maintenez et optimisez votre équilibre physiologique",col:"#0F6E56",bg:"#E1F5EE",ben:["Maintien de l'équilibre global","Optimisation de l'énergie et récupération","Protection et prévention sur le long terme"],ing:"Multivitamines · Oméga 3 · Magnésium · Adaptogènes",cta:"Optimiser mon potentiel santé"}
+};
+function pKey(r){
+  if(r.profile==="homogene")return"optimisation";
+  const p1=r.priority1?.name,p2=r.priority2?.name;
+  if(p1&&p2&&((p1==="digestif"&&p2==="stress")||(p1==="stress"&&p2==="digestif")))return"combo_digestif_stress";
+  return p1||"optimisation";
+}
+
+/* ═══════════════════════════════════════
+   PROFILS & TEXTES
+═══════════════════════════════════════ */
+const PROF={
+  combined:{
+    badge:"Profil Combiné",sub:"⚠️ Déséquilibre systémique détecté",
+    desc:"Votre bilan révèle que plusieurs systèmes de votre organisme sont actuellement déséquilibrés simultanément. Votre corps ne compense plus correctement, ce qui peut entraîner une fatigue persistante, des troubles digestifs et une baisse de vos capacités.\n\n✅ Ce profil est réversible avec une action globale et structurée.",
+    zone:"Priorité d'intervention",zt:"Ciblage multi-systèmes nécessaire.",
+    bg:"#FCEBEB",zc:"#E24B4A",tc:"#501313"
+  },
+  isole:{
+    badge:"Profil Isolé",sub:"⚠️ Zone de déséquilibre ciblée",
+    desc:"Votre bilan met en évidence un système spécifique en déséquilibre, tandis que les autres restent encore stables. Sans correction, ce déséquilibre peut progressivement s'étendre.\n\n✅ Une action ciblée permet généralement une correction rapide.",
+    zone:"Zone de prévention",zt:"Prévenir la progression du déséquilibre.",
+    bg:"#FAEEDA",zc:"#BA7517",tc:"#412402"
+  },
+  homogene:{
+    badge:"Profil Homogène",sub:"✅ Équilibre physiologique global",
+    desc:"Votre bilan montre que vos principaux systèmes sont globalement équilibrés. Votre organisme fonctionne de manière stable.\n\n📈 Objectif : maintenir cet état et optimiser votre potentiel santé.",
+    zone:"Zone d'optimisation",zt:"Maintien et optimisation de votre potentiel.",
+    bg:"#E1F5EE",zc:"#0F6E56",tc:"#04342C"
+  }
+};
+
+const AXT={
+  digestif:{
+    eleve:{t:"🔎 Surcharge digestive détectée",b:"Déséquilibre digestif important, souvent lié à une inflammation ou une dysbiose. Cela peut entraîner fatigue après les repas et troubles digestifs récurrents.",c:"Une correction ciblée permet généralement une amélioration rapide."},
+    moyen:{t:"⚠️ Fragilité digestive",b:"Votre système digestif montre des signes de déséquilibre modéré. Peut évoluer vers un terrain inflammatoire si rien n'est fait.",c:"Une action préventive stabilise rapidement cet axe."},
+    faible:{t:"✅ Équilibre digestif satisfaisant",b:"Votre digestion semble globalement stable.",c:"Objectif : maintenir cet équilibre et optimiser votre confort digestif."}
+  },
+  stress:{
+    eleve:{t:"🔎 Surcharge du système nerveux",b:"Votre organisme semble en état de stress chronique. Cela peut entraîner fatigue nerveuse, troubles du sommeil, irritabilité et dérèglement hormonal.",c:"Une régulation du stress est prioritaire."},
+    moyen:{t:"⚠️ Stress modéré",b:"Votre système nerveux est sollicité mais encore adaptable.",c:"Une régulation précoce évite un épuisement progressif."},
+    faible:{t:"✅ Équilibre nerveux satisfaisant",b:"Bonne gestion du stress globalement.",c:"À maintenir."}
+  },
+  metabolisme:{
+    eleve:{t:"🔎 Déséquilibre métabolique",b:"Votre organisme montre des signes de dérèglement énergétique : fringales, stockage abdominal, fatigue post-repas.",c:"Une correction nutritionnelle ciblée est nécessaire."},
+    moyen:{t:"⚠️ Instabilité métabolique",b:"Votre énergie est irrégulière dans la journée.",c:"Des ajustements simples permettent une amélioration rapide."},
+    faible:{t:"✅ Métabolisme stable",b:"Votre métabolisme fonctionne de façon équilibrée.",c:"Objectif : maintenir cet équilibre."}
+  },
+  energie:{
+    eleve:{t:"🔎 Fatigue chronique détectée",b:"Votre organisme manque de ressources. Cela impacte votre motivation, votre récupération et votre performance quotidienne.",c:"Recharger l'organisme est prioritaire."},
+    moyen:{t:"⚠️ Baisse d'énergie",b:"Votre niveau d'énergie est instable et irrégulier.",c:"Une optimisation est recommandée."},
+    faible:{t:"✅ Bonne énergie globale",b:"Votre niveau d'énergie est satisfaisant.",c:"À maintenir."}
+  },
+  psycho:{
+    eleve:{t:"🔎 Charge mentale élevée",b:"Votre équilibre émotionnel est impacté. Cela peut amplifier les autres déséquilibres et réduire vos capacités d'adaptation.",c:"Une régulation psycho-émotionnelle est essentielle."},
+    moyen:{t:"⚠️ Fragilité émotionnelle",b:"Votre équilibre émotionnel montre quelques signes de tension.",c:"Un soutien ciblé est recommandé."},
+    faible:{t:"✅ Équilibre émotionnel satisfaisant",b:"Votre équilibre psycho-émotionnel est globalement stable.",c:"À maintenir."}
+  }
+};
+
+function lvlK(s){return s<=6?"faible":s<=12?"moyen":"eleve";}
+function axLbl(k){return{digestif:"Système digestif & Inflammation",stress:"Stress neuro-endocrinien",metabolisme:"Métabolisme",energie:"Énergie & Fatigue",psycho:"Psycho-émotionnel"}[k]||k;}
+function gc(s){return s<=6?"#1D9E75":s<=12?"#EF9F27":"#E24B4A";}
+function gl(s){return s<=6?{l:"Faible",c:"lf"}:s<=12?{l:"Moyen",c:"lm"}:{l:"Élevé",c:"le"};}
+function asc(i){let s=0;for(let j=i*6;j<i*6+6;j++)if(ans[j]!==null)s+=ans[j];return s;}
+
+/* ═══════════════════════════════════════
+   SUIVI — localStorage
+═══════════════════════════════════════ */
+const CK=[
+  {key:"energie",lb:"Énergie",ic:"🔋",col:"#185FA5",fl:"#E6F1FB"},
+  {key:"stress",lb:"Stress",ic:"🧠",col:"#534AB7",fl:"#EEEDFE"},
+  {key:"digestion",lb:"Digestion",ic:"🫁",col:"#993C1D",fl:"#FAECE7"},
+  {key:"sommeil",lb:"Sommeil",ic:"😴",col:"#0F6E56",fl:"#E1F5EE"},
+  {key:"humeur",lb:"Humeur",ic:"💚",col:"#993556",fl:"#FBEAF0"}
+];
+const EM=["","😄","🙂","😐","😕","😞"];
+const LB=["","Très bien","Bien","Moyen","Mauvais","Très mauvais"];
+let cv={};
+
+function ls(k,v){
+  if(v===undefined){try{return JSON.parse(localStorage.getItem("phc_"+k));}catch{return null;}}
+  try{localStorage.setItem("phc_"+k,JSON.stringify(v));}catch{}
+}
+function td(){return new Date().toISOString().slice(0,10);}
+function hist(){return ls("h")||[];}
+function saveE(score,axes){
+  const h=hist(),i=h.findIndex(x=>x.d===td());
+  if(i>=0)h[i]={d:td(),s:score,a:axes};
+  else h.push({d:td(),s:score,a:axes});
+  if(h.length>90)h.splice(0,h.length-90);
+  ls("h",h);
+}
+function doneT(){return hist().some(x=>x.d===td());}
+function streak(){
+  const h=hist();if(!h.length)return 0;
+  let s=0;const n=new Date();
+  for(let i=0;i<30;i++){
+    const d=new Date(n);d.setDate(d.getDate()-i);
+    if(h.some(x=>x.d===d.toISOString().slice(0,10)))s++;
+    else if(i>0)break;
+  }
+  return s;
+}
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function go(tab){
+  show("s-"+tab);
+  if(tab==="dash")rDash();
+  if(tab==="check")iCheck();
+  if(tab==="prog")rProg();
+  updDot();
+}
+function updDot(){
+  const d=document.getElementById("ndot");
+  if(d)d.classList.toggle("show",!doneT()&&hist().length>0);
+}
+
+/* ═══════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════ */
+function startQuiz(){
+  ans=new Array(30).fill(null);cur=0;
+  show("s-quiz");render();
+}
+function restart(){
+  ans=new Array(30).fill(null);cur=0;gSc=[];cSlide=0;gReco={};
+  show("s-land");
+}
+function goBack(){if(cur>0){cur--;render();}}
+function goNext(){
+  if(ans[cur]===null)return;
+  if(cur===29)doAnalyse();
+  else{cur++;render();}
+}
+function render(){
+  const ai=Math.floor(cur/6),ax=AXES[ai];
+  document.getElementById("axe-lbl").textContent=`Étape ${ai+1} / 5`;
+  document.getElementById("axe-lbl").style.color=ax.color;
+  document.getElementById("q-cnt").textContent=`Q ${cur+1} / 30`;
+  const pf=document.getElementById("pfill");
+  pf.style.width=Math.round(cur/30*100)+"%";pf.style.background=ax.color;
+  const ic=document.getElementById("axe-icon-c");
+  ic.style.background=ax.bg;ic.textContent=ax.icon;
+  const card=document.getElementById("quiz-card");
+  card.style.animation="none";void card.offsetHeight;card.style.animation="";
+  document.getElementById("q-nm").textContent=ax.name;
+  document.getElementById("q-nm").style.color=ax.color;
+  document.getElementById("q-tx").textContent=ax.qs[cur%6];
+  document.getElementById("q-sb").textContent=ax.sub;
+  const al=document.getElementById("ans-list");al.innerHTML="";
+  ANS.forEach((a,i)=>{
+    const b=document.createElement("button");
+    b.className="apill"+(ans[cur]===i?" "+SEL[i]:"");
+    b.textContent=a;
+    b.onclick=()=>{ans[cur]=i;render();};
+    al.appendChild(b);
+  });
+  document.getElementById("axe-sc-mini").textContent=`Score axe ${ai+1} : ${asc(ai)} / 18`;
+  document.getElementById("btn-prev").style.visibility=cur===0?"hidden":"visible";
+  const nn=document.getElementById("btn-nxt");
+  nn.className="bnxt"+(ans[cur]!==null?" ok":"");
+  nn.style.background=ax.color;nn.style.color="#fff";
+  nn.textContent=cur===29?"Voir mes résultats →":"Suivant →";
+}
+
+function doAnalyse(){
+  show("s-analyse");
+  document.querySelectorAll(".an-step").forEach((s,i)=>setTimeout(()=>s.classList.add("done"),i*380));
+  setTimeout(buildResults,2300);
+}
+
+/* ═══════════════════════════════════════
+   GÉNÉRATION RECOMMANDATION
+═══════════════════════════════════════ */
+function genReco(scores){
+  const axes=[
+    {name:"digestif",score:scores[0]},{name:"stress",score:scores[1]},
+    {name:"metabolisme",score:scores[2]},{name:"energie",score:scores[3]},{name:"psycho",score:scores[4]}
+  ];
+  const sorted=[...axes].sort((a,b)=>b.score-a.score);
+  const high=axes.filter(a=>a.score>=7);
+  let type=high.length>=2?"combined":high.length===1?"isole":"homogene";
+  let p1,p2;
+  if(type==="combined"){p1=sorted[0];p2=sorted[1];}
+  else if(type==="isole"){
+    p1=high[0];
+    p2=sorted.find(a=>a.name!==p1.name&&(a.name==="stress"||a.name==="energie"))||sorted[1];
+  } else {p1={name:"optimisation"};p2=null;}
+  function pk(a,b,t){
+    if(t==="homogene")return"Pack Optimisation";
+    const m={digestif:"Digestif",stress:"Stress",metabolisme:"Métabolisme",energie:"Énergie",psycho:"Psycho"};
+    if(b)return`Pack ${m[a.name]||a.name} & ${m[b.name]||b.name}`;
+    return`Pack ${m[a.name]||a.name}`;
+  }
+  return{profile:type,priority1:p1,priority2:p2,pack:pk(p1,p2,type)};
+}
+
+/* ═══════════════════════════════════════
+   BUILD RESULTS
+═══════════════════════════════════════ */
+function buildResults(){
+  gSc=AXES.map((_,i)=>asc(i));
+  gReco=genReco(gSc);
+  const type=gReco.profile,p=PROF[type];
+  const pc={combined:"#E24B4A",isole:"#BA7517",homogene:"#0F6E56"};
+  const pb={combined:"#FCEBEB",isole:"#FAEEDA",homogene:"#E1F5EE"};
+  const p1l=gReco.priority1.name!=="optimisation"?axLbl(gReco.priority1.name):null;
+  const p2l=gReco.priority2?axLbl(gReco.priority2.name):null;
+
+  /* ── Profil box ── */
+  const descParts=p.desc.split("\n").filter(l=>l.trim());
+  document.getElementById("profile-box").innerHTML=`
+    <div style="background:${p.bg};border-radius:18px;padding:13px;margin-bottom:9px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+        <div style="font-size:26px">${type==="combined"?"🔴":type==="isole"?"🟡":"🟢"}</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:${p.tc}">${p.badge}</div>
+          <div style="font-size:11px;font-weight:700;color:${p.tc};opacity:.8">${p.sub}</div>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:${p.tc};line-height:1.7;margin-bottom:9px">
+        ${descParts.map(l=>`<p style="margin-bottom:5px">${l}</p>`).join("")}
+      </div>
+      <div style="background:${p.zc};color:#fff;border-radius:9px;padding:7px 10px;font-size:11.5px;font-weight:700">
+        ${p.zone} — ${p.zt}
+      </div>
+    </div>`;
+
+  document.getElementById("total-num").textContent=gSc.reduce((a,b)=>a+b,0)+" / 90";
+
+  /* ── Tension ── */
+  const tt={
+    combined:{h:"⚠️ Sans prise en charge, ce profil peut s'aggraver",i:["⚠️ <strong>Fatigue persistante</strong> si aucune action n'est mise en place","⚠️ <strong>Troubles digestifs ou inflammatoires</strong> récurrents","⚠️ <strong>Baisse des capacités physiques et mentales</strong> progressive","⚠️ Ces axes sont interconnectés — agir sur un seul limiterait les résultats"]},
+    isole:{h:"⚠️ Ce déséquilibre peut progressivement s'étendre",i:["⚠️ <strong>Impact sur votre énergie</strong> si non corrigé rapidement","⚠️ <strong>Perturbation d'autres systèmes</strong> par effet domino","⚠️ <strong>Évolution vers un déséquilibre global</strong> sans correction ciblée"]},
+    homogene:{h:"⚠️ Cet équilibre dépend de vos habitudes actuelles",i:["⚠️ <strong>Un changement de mode de vie</strong> peut rapidement modifier cet équilibre","⚠️ <strong>L'optimisation préventive</strong> reste la stratégie la plus efficace","📈 <strong>Objectif :</strong> consolider et optimiser votre potentiel santé"]}
+  };
+  const t=tt[type];
+  document.getElementById("tension-block").innerHTML=`
+    <div class="rc" style="border-left:3px solid ${pc[type]};border-radius:0 18px 18px 0;margin-bottom:9px">
+      <div style="font-size:11px;font-weight:700;color:${pc[type]};margin-bottom:7px">${t.h}</div>
+      ${t.i.map(i=>`<div style="font-size:11px;color:#4A4A6A;line-height:1.55;margin-bottom:4px">${i}</div>`).join("")}
+    </div>`;
+
+  /* ── Priorités ── */
+  document.getElementById("priorities-block").innerHTML=`
+    <div class="rc" style="margin-bottom:9px">
+      <div class="rct">🎯 Priorités physiologiques identifiées</div>
+      ${p1l?`<div style="display:flex;align-items:center;gap:9px;background:${pb[type]};border-radius:11px;padding:9px 11px;margin-bottom:7px">
+        <div style="width:21px;height:21px;border-radius:50%;background:${pc[type]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0">1</div>
+        <div><div style="font-size:12px;font-weight:700;color:${pc[type]}">${p1l}</div>
+        <div style="font-size:10px;color:#8A8FA8;margin-top:1px">Axe dominant — action prioritaire</div></div>
+      </div>`:""}
+      ${p2l?`<div style="display:flex;align-items:center;gap:9px;background:#F0F2F7;border-radius:11px;padding:9px 11px;margin-bottom:7px">
+        <div style="width:21px;height:21px;border-radius:50%;background:#8A8FA8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0">2</div>
+        <div><div style="font-size:12px;font-weight:700;color:#4A4A6A">${p2l}</div>
+        <div style="font-size:10px;color:#8A8FA8;margin-top:1px">Axe support</div></div>
+      </div>`:""}
+      ${type!=="homogene"&&p2l?`<div style="font-size:10.5px;color:${pc[type]};font-weight:700;padding-top:6px;border-top:.5px solid #F0F2F7">⚠️ Ces deux axes sont interconnectés. Agir sur un seul limiterait les résultats.</div>`:""}
+    </div>`;
+
+  /* ── Analyse par axe (slide 2) ── */
+  const sa=[...AXES.map((a,i)=>({...a,score:gSc[i]}))].sort((a,b)=>b.score-a.score);
+  document.getElementById("score-detail").innerHTML=sa.map(a=>{
+    const s=a.score,c=gc(s),pct=Math.round(s/18*100),lv=gl(s),tx=AXT[a.key][lvlK(s)];
+    return `<div class="sdr" style="flex-direction:column;align-items:flex-start;gap:5px">
+      <div style="display:flex;align-items:center;gap:6px;width:100%">
+        <span style="font-size:15px;width:20px;text-align:center;flex-shrink:0">${a.icon}</span>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:700;color:#1C1C2E;margin-bottom:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+            ${a.name}<span class="lb ${lv.c}">${lv.l}</span>
+          </div>
+          <div class="sbi"><div class="sbf" style="width:${pct}%;background:${c}"></div></div>
+          <div style="font-size:9.5px;color:#B0B4C8;font-weight:700">${s} pts / 18</div>
+        </div>
+        <div style="font-size:13px;font-weight:800;color:${c};min-width:34px;text-align:right">${s}/18</div>
+      </div>
+      <div style="background:${c}18;border-left:3px solid ${c};border-radius:0 8px 8px 0;padding:7px 9px;width:100%">
+        <div style="font-size:10.5px;font-weight:700;color:${c};margin-bottom:3px">${tx.t}</div>
+        <div style="font-size:10.5px;color:#4A4A6A;line-height:1.55;margin-bottom:2px">${tx.b}</div>
+        <div style="font-size:10px;font-weight:700;color:${c}">${tx.c}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  /* ── Que faire (slide 3) ── */
+  document.getElementById("whatnow-block").innerHTML=`
+    <div class="rc" style="margin-bottom:9px">
+      <div class="rct">🧠 Que faire maintenant ?</div>
+      <div style="font-size:12px;color:#4A4A6A;line-height:1.7">
+        ${type==="combined"?"Une approche <strong>multi-systèmes simultanée</strong> est nécessaire pour des résultats durables.":type==="isole"?"Une action <strong>ciblée sur l'axe principal</strong> permettra une correction rapide et efficace.":"Un programme d'<strong>optimisation et maintenance</strong> consolidera votre équilibre."}
+      </div>
+    </div>`;
+
+  /* ── Plan recommandé ── */
+  const po={
+    combined:["Corriger les déséquilibres multi-systèmes identifiés","Relancer votre énergie et réduire la fatigue","Stabiliser votre organisme de manière globale"],
+    isole:["Corriger le déséquilibre sur l'axe principal","Prévenir la propagation vers d'autres systèmes","Rétablir l'équilibre et l'énergie"],
+    homogene:["Maintenir et consolider l'équilibre existant","Optimiser votre énergie et récupération","Protéger votre santé sur le long terme"]
+  };
+  const paxs=[];
+  if(p1l)paxs.push({l:p1l,c:pc[type]});
+  if(p2l)paxs.push({l:p2l,c:"#8A8FA8"});
+  document.getElementById("plan-block").innerHTML=`
+    <div class="rc" style="margin-bottom:9px;border:1.5px solid ${pc[type]}25">
+      <div class="rct">🔬 Plan recommandé pour votre profil</div>
+      <div style="font-size:11px;color:#B0B4C8;margin-bottom:9px">Basé sur votre bilan du ${new Date().toLocaleDateString("fr-FR")}</div>
+      ${paxs.map(a=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12px;font-weight:700;color:${a.c}">✅ ${a.l}</div>`).join("")}
+      <div style="height:.5px;background:#F0F2F7;margin:8px 0"></div>
+      ${po[type].map(o=>`<div style="display:flex;align-items:flex-start;gap:6px;font-size:11.5px;color:#4A4A6A;margin-bottom:4px;line-height:1.5"><span style="color:${pc[type]};font-weight:700;flex-shrink:0">—</span>${o}</div>`).join("")}
+    </div>`;
+
+  /* ── Fiche produit ── */
+  const prod=PRODS[pKey(gReco)];
+  document.getElementById("product-card-slot").innerHTML=`
+    <div class="pc" style="margin-bottom:9px">
+      <div class="ph">
+        <div class="pew" style="background:${prod.bg}">${prod.e}</div>
+        <div>
+          <div class="pcat" style="color:${prod.col}">${prod.cat}</div>
+          <div class="pname">${prod.name}</div>
+          ${prod.pack?`<div style="display:inline-flex;align-items:center;background:#1C1C2E;color:#fff;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:3px">⭐ Solution Premium</div>`:""}
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:${prod.col};padding:0 13px 9px;line-height:1.45">${prod.hl}</div>
+      <div style="height:.5px;background:#F0F2F7;margin:0 13px"></div>
+      <div style="padding:9px 13px">
+        ${prod.ben.map(b=>`<div class="pbf"><div class="pck" style="background:${prod.col}">✓</div>${b}</div>`).join("")}
+      </div>
+      <div style="padding:0 13px;font-size:10px;color:#B0B4C8;margin-bottom:9px"><strong>Formule :</strong> ${prod.ing}</div>
+      <div style="padding:0 13px 13px">
+        <button style="width:100%;background:${prod.col};color:#fff;border:none;border-radius:999px;padding:12px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer" onclick="alert('Redirection vers la boutique…')">👉 ${prod.cta}</button>
+      </div>
+    </div>`;
+
+  /* ── Recommandations (slide 4) ── */
+  const recs={
+    combined:[{i:"🔬",t:"Rééquilibrage digestif & microbiote"},{i:"🧘",t:"Régulation neuro-endocrinienne"},{i:"⚡",t:"Activation métabolique ciblée"},{i:"💊",t:"Soutien micronutritionnel personnalisé"}],
+    isole:[{i:"🎯",t:`Correction prioritaire : ${p1l||"Axe principal"}`},{i:"🔬",t:"Régulation neuro-endocrinienne"},{i:"😴",t:"Optimisation du sommeil et récupération"},{i:"🌿",t:"Techniques de régulation adaptées"}],
+    homogene:[{i:"✅",t:"Activation métabolique de maintien"},{i:"🔋",t:"Optimisation de l'énergie globale"},{i:"🧘",t:"Régulation neuro-endocrinienne préventive"},{i:"💊",t:"Suivi micronutritionnel personnalisé"}]
+  };
+  document.getElementById("rec-list").innerHTML=recs[type].map(r=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:.5px solid #F0F2F7;font-size:12px;color:#4A4A6A;line-height:1.5">
+      <div style="width:27px;height:27px;border-radius:8px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${r.i}</div>
+      ${r.t}
+    </div>`).join("");
+
+  /* ── Sauvegarde contexte bilan ── */
+  if(gReco.pack)ls("proto",gReco.pack);
+  if(gReco.priority1&&gReco.priority1.name!=="optimisation")ls("prio",axLbl(gReco.priority1.name));
+  ls("hasBilan",true);
+
+  drawRadar(gSc);
+  cSlide=0;updSlideNav();
+  show("s-results");
+  updDot();
+}
+
+/* ── Radar ── */
+function drawRadar(sc){
+  const cv=document.getElementById("radarChart");if(!cv)return;
+  const cx=90,cy=90,r=66,n=5,lb=["Inflam.","Stress","Métabo.","Énergie","Psycho"];
+  const ag=Array.from({length:n},(_,i)=>Math.PI*2/n*i-Math.PI/2);
+  const c=cv.getContext("2d");c.clearRect(0,0,180,180);
+  [.25,.5,.75,1].forEach(t=>{c.beginPath();ag.forEach((a,i)=>{const x=cx+Math.cos(a)*r*t,y=cy+Math.sin(a)*r*t;i?c.lineTo(x,y):c.moveTo(x,y);});c.closePath();c.strokeStyle="rgba(128,128,128,.18)";c.lineWidth=1;c.stroke();});
+  ag.forEach(a=>{c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);c.strokeStyle="rgba(128,128,128,.18)";c.lineWidth=1;c.stroke();});
+  c.beginPath();sc.forEach((s,i)=>{const t=s/18,x=cx+Math.cos(ag[i])*r*t,y=cy+Math.sin(ag[i])*r*t;i?c.lineTo(x,y):c.moveTo(x,y);});c.closePath();c.fillStyle="rgba(15,110,86,.15)";c.fill();c.strokeStyle="#0F6E56";c.lineWidth=2.5;c.stroke();
+  sc.forEach((s,i)=>{const t=s/18,x=cx+Math.cos(ag[i])*r*t,y=cy+Math.sin(ag[i])*r*t;c.beginPath();c.arc(x,y,3.5,0,Math.PI*2);c.fillStyle=gc(s);c.fill();});
+  c.font="9.5px system-ui,sans-serif";c.fillStyle="rgba(128,128,128,.8)";c.textAlign="center";
+  ag.forEach((a,i)=>{const x=cx+Math.cos(a)*(r+14),y=cy+Math.sin(a)*(r+14)+3;c.fillText(lb[i],x,y);});
+}
+
+/* ── Slides résultats ── */
+function goSlide(d){jSlide(cSlide+d);}
+function jSlide(i){
+  if(i<0||i>3)return;cSlide=i;
+  document.getElementById("slides-track").style.transform=`translateX(-${i*100}%)`;
+  updSlideNav();
+}
+function updSlideNav(){
+  document.getElementById("bsl-prev").disabled=cSlide===0;
+  const nb=document.getElementById("bsl-next");
+  nb.disabled=cSlide===3;nb.textContent=cSlide===3?"Terminé ✓":"Suivant →";
+  document.querySelectorAll(".ddt").forEach((d,j)=>d.classList.toggle("on",j===cSlide));
+}
+function sendEmail(){
+  const i=document.getElementById("email-in");
+  if(!i.value.includes("@")){i.style.borderColor="#E24B4A";return;}
+  document.getElementById("email-row").style.display="none";
+  document.getElementById("email-ok").style.display="block";
+}
+
+/* ═══════════════════════════════════════
+   ONBOARDING → DASHBOARD
+═══════════════════════════════════════ */
+function lancerSuivi(){
+  if(!ls("ob_done"))show("s-onboarding");
+  else go("dash");
+}
+function validerOnboarding(skip){
+  if(!skip){
+    const n=document.getElementById("ob-name").value.trim();
+    if(n)ls("name",n);
+  }
+  ls("ob_done",true);
+  go("dash");
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+function rDash(){
+  const h=hist(),done=doneT(),entry=done?h.find(x=>x.d===td()):null;
+  const d=new Date();
+  document.getElementById("ddate").textContent=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  const name=ls("name");
+  document.getElementById("dgreet").textContent=name?`Bonjour ${name} 👋`:"Bonjour 👋";
+  const sk=streak();
+  document.getElementById("dstreak").innerHTML=sk>=2
+    ?`<span style="display:inline-flex;align-items:center;gap:4px;background:#FAEEDA;color:#412402;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700">🔥 ${sk} jours</span>`
+    :"";
+  const sn=document.getElementById("dsnum"),
+        sd=document.getElementById("dsdenom"),
+        st=document.getElementById("dsdelta"),
+        dc=document.getElementById("dscard"),
+        db=document.getElementById("dsdone");
+  if(entry){
+    const s=entry.s,col=s>=70?"#0F6E56":s>=50?"#854F0B":"#A32D2D";
+    sn.textContent=s;sn.style.color=col;
+    sd.textContent="/ 100";
+    if(dc)dc.style.borderColor=col+"40";
+    if(h.length>=2){
+      const diff=s-h[h.length-2].s;
+      st.textContent=diff>0?`↑ +${diff} pts depuis hier`:diff<0?`↓ ${Math.abs(diff)} pts depuis hier`:"Stable depuis hier";
+      st.style.color=diff>0?"#0F6E56":diff<0?"#A32D2D":"#B0B4C8";
+    }
+    db.innerHTML=`<div class="donebar"><span style="font-size:15px">✅</span> Check du jour effectué</div>`;
+  } else {
+    sn.textContent="—";sn.style.color="#1C1C2E";
+    sd.textContent="";
+    st.textContent=h.length?"Check non effectué aujourd'hui":"Aucun check enregistré encore";
+    st.style.color="#B0B4C8";
+    db.innerHTML="";
+  }
+  const cta=document.getElementById("dcta");
+  if(!done){
+    cta.innerHTML=`<button class="bpri" onclick="go('check')"><span style="font-size:16px">⚡</span> Faire mon check du jour <span style="opacity:.7;font-size:12px">10 sec</span></button>`;
+  } else {
+    cta.innerHTML=`<div class="brow"><button class="bpri" onclick="go('check')" style="flex:1">📊 Mon score</button><button class="bghost" onclick="go('prog')" style="flex:1">📈 Progression</button></div>`;
+  }
+  const prio=ls("prio");
+  document.getElementById("dobj").innerHTML=prio
+    ?`Améliorer votre <strong>${prio}</strong> et stabiliser votre équilibre global.`
+    :"Maintenir et optimiser votre équilibre physiologique global.";
+  const foc=document.getElementById("dfocus");
+  if(entry){
+    const w=CK.reduce((ww,ax)=>(!ww||entry.a[ax.key]>entry.a[ww.key])?ax:ww,null);
+    if(w){
+      const raw=entry.a[w.key]||3;
+      foc.innerHTML=`<div class="focrow" style="background:${w.fl}">
+        <div style="width:38px;height:38px;border-radius:9px;background:${w.col}20;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">${w.ic}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:${w.col}">${w.lb} — ${LB[raw]}</div>
+          <div style="font-size:11px;color:#8A8FA8;margin-top:1px">Axe le plus difficile aujourd'hui ${EM[raw]}</div>
+        </div>
+      </div>`;
+    }
+  } else {
+    foc.innerHTML=`<div style="font-size:13px;color:#8A8FA8;line-height:1.6">Effectuez votre check pour identifier l'axe à travailler.</div>`;
+  }
+  const fb=document.getElementById("dfeedback");
+  if(h.length>=2&&entry){
+    const l3=h.slice(-3).map(x=>x.s),tr=l3[l3.length-1]-(l3[0]||entry.s);
+    let cls,txt;
+    if(tr>3){cls="ok";txt="✅ Votre organisme répond positivement. Continuez votre protocole actuel.";}
+    else if(tr<-3){cls="bad";txt="⚠️ Votre état semble se dégrader. Il est recommandé d'agir rapidement.";}
+    else{cls="warn";txt="⚠️ Votre progression est limitée. Un ajustement pourrait être nécessaire.";}
+    fb.innerHTML=`<div class="fb ${cls}">${txt}</div>`;
+  } else if(!ls("hasBilan")){
+    fb.innerHTML=`<div class="fb info">💡 Commencez par faire votre bilan santé dans l'onglet Mon bilan.</div>`;
+  } else {
+    fb.innerHTML="";
+  }
+}
+
+/* ═══════════════════════════════════════
+   CHECK QUOTIDIEN
+═══════════════════════════════════════ */
+function iCheck(){
+  cv={};
+  document.getElementById("cform").style.display="";
+  document.getElementById("cresult").style.display="none";
+  const d=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  document.getElementById("cdate").textContent=d.charAt(0).toUpperCase()+d.slice(1);
+  updCP();
+  document.getElementById("caxes").innerHTML=CK.map((ax,i)=>`
+    <div class="axrow au au${i+1}">
+      <div class="axtop">
+        <div class="axnm">
+          <div class="axic" style="background:${ax.fl}">${ax.ic}</div>
+          ${ax.lb}
+        </div>
+        <span class="vbadge" id="vb-${ax.key}">—</span>
+      </div>
+      <div class="b5">
+        ${[1,2,3,4,5].map(v=>`<button class="sb" data-v="${v}" onclick="pick('${ax.key}',${v},this)">${EM[v]}</button>`).join("")}
+      </div>
+    </div>`).join("");
+}
+function updCP(){
+  const n=CK.filter(a=>cv[a.key]!==undefined).length;
+  document.getElementById("cpfill").style.width=Math.round(n/5*100)+"%";
+  document.getElementById("ccount").textContent=n+" / 5";
+  const b=document.getElementById("bval");
+  const ok=n===5;b.style.opacity=ok?"1":"0.3";b.style.pointerEvents=ok?"all":"none";
+}
+function pick(key,v,btn){
+  cv[key]=v;
+  btn.closest(".b5").querySelectorAll(".sb").forEach(b=>b.classList.toggle("on",parseInt(b.dataset.v)===v));
+  const vb=document.getElementById("vb-"+key);
+  if(vb){
+    vb.textContent=EM[v]+" "+LB[v];
+    const bg=["","#E1F5EE","#EAF3DE","#FAEEDA","#FAECE7","#FCEBEB"];
+    const fg=["","#0F6E56","#3B6D11","#854F0B","#712B13","#A32D2D"];
+    vb.style.background=bg[v];vb.style.color=fg[v];
+  }
+  updCP();
+}
+
+/* ── Calcul score : moyenne des 5 axes × 20 (spec PDF) ── */
+function valider(){
+  if(CK.some(a=>cv[a.key]===undefined))return;
+  const score=Math.round(CK.reduce((s,a)=>s+(cv[a.key]||0),0)/CK.length*20);
+  saveE(score,{...cv});
+  document.getElementById("cform").style.display="none";
+  const res=document.getElementById("cresult");res.style.display="flex";
+  const arc=document.getElementById("sarc"),C=415;
+  const col=score>=70?"#1D9E75":score>=50?"#EF9F27":"#E24B4A";
+  arc.style.strokeDashoffset=C;arc.style.stroke=col;
+  setTimeout(()=>arc.style.strokeDashoffset=C-(C*score/100),80);
+  const sc=document.getElementById("cscore");sc.style.color=col;
+  let n=0;const iv=setInterval(()=>{n=Math.min(n+Math.ceil(score/26),score);sc.textContent=n;if(n>=score)clearInterval(iv);},28);
+  const h=hist(),dEl=document.getElementById("cdelta");
+  if(h.length>=2){
+    const diff=score-h[h.length-2].s;
+    dEl.textContent=diff>0?`↑ +${diff} pts depuis hier`:diff<0?`↓ ${Math.abs(diff)} pts depuis hier`:"Stable depuis hier";
+    dEl.style.color=diff>0?"#0F6E56":diff<0?"#A32D2D":"#B0B4C8";
+  } else {
+    dEl.textContent="Premier check enregistré !";dEl.style.color="#0F6E56";
+  }
+  const l3=h.slice(-3).map(x=>x.s);let cls,txt;
+  if(l3.length>=2){
+    const tr=l3[l3.length-1]-(l3[0]||score);
+    if(tr>3){cls="ok";txt="✅ Votre organisme répond positivement. Continuez votre protocole actuel.";}
+    else if(tr<-3){cls="bad";txt="⚠️ Votre état semble se dégrader. Il est recommandé d'agir rapidement.";}
+    else{cls="warn";txt="⚠️ Votre progression est limitée. Un ajustement pourrait être nécessaire.";}
+  } else {cls="info";txt="📊 Premier enregistrement. Revenez demain pour suivre votre évolution.";}
+  const fb=document.getElementById("cfb");fb.className="fb "+cls;fb.textContent=txt;
+  const te=h.find(x=>x.d===td()),pv=h.length>=2&&h[h.length-1].d===td()?h[h.length-2]:null;
+  document.getElementById("cgrid").innerHTML=CK.map(ax=>{
+    const raw=te?.a?.[ax.key]||cv[ax.key]||3,inv=6-raw;
+    const pRaw=pv?.a?.[ax.key],pInv=pRaw!==undefined?6-pRaw:undefined;
+    const tr=pInv!==undefined?(inv>pInv?"↑":inv<pInv?"↓":"→"):"-";
+    const tc=tr==="↑"?"#0F6E56":tr==="↓"?"#A32D2D":"#B0B4C8";
+    const pct=Math.round(inv/5*100);
+    return `<div class="axmini">
+      <div class="axmbar"></div>
+      <div class="axmfill" style="width:${pct}%;background:${ax.col}"></div>
+      <div class="axmlbl">${ax.ic} ${ax.lb}</div>
+      <div class="axmval">${EM[raw]}</div>
+      <div class="axmtrend" style="color:${tc}">${tr} ${LB[raw]}</div>
+    </div>`;
+  }).join("");
+  updDot();rDash();
+}
+
+/* ═══════════════════════════════════════
+   PROGRESSION
+═══════════════════════════════════════ */
+function rProg(){
+  const h=hist();
+  const pe=document.getElementById("pempty"),pc=document.getElementById("pcontent");
+  if(!h.length){pe.style.display="block";pc.style.display="none";return;}
+  pe.style.display="none";pc.style.display="block";
+  document.getElementById("psub").textContent=`${h.length} check${h.length>1?"s":""} enregistré${h.length>1?"s":""}`;
+  const sk=streak(),avg=Math.round(h.reduce((s,x)=>s+x.s,0)/h.length),best=Math.max(...h.map(x=>x.s));
+  document.getElementById("pstats").innerHTML=[
+    {ic:"📋",v:h.length,l:"Checks"},
+    {ic:"🔥",v:sk+"j",l:"Série"},
+    {ic:"📊",v:avg,l:"Moyenne"},
+    {ic:"🏆",v:best,l:"Meilleur"}
+  ].map(s=>`<div class="stbox"><div style="font-size:16px;margin-bottom:2px">${s.ic}</div><div class="stval">${s.v}</div><div class="stlbl">${s.l}</div></div>`).join("");
+
+  /* Graphique */
+  const canvas=document.getElementById("pchart");
+  if(canvas){
+    const ctx=canvas.getContext("2d");
+    const W=canvas.offsetWidth||300,H=85;
+    canvas.width=W*2;canvas.height=H*2;ctx.scale(2,2);
+    const last=h.slice(-7),bw=Math.floor((W-12)/Math.max(last.length,1));
+    ctx.clearRect(0,0,W,H);
+    [25,50,75].forEach(y=>{
+      const yp=H-10-Math.round(y/100*(H-18));
+      ctx.strokeStyle="rgba(128,128,128,.12)";ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(6,yp);ctx.lineTo(W-6,yp);ctx.stroke();
+    });
+    last.forEach((x,i)=>{
+      const bx=6+i*bw+bw*.1,bW=bw*.8,bH=Math.max(3,Math.round((x.s/100)*(H-18)));
+      const col=x.s>=70?"#1D9E75":x.s>=50?"#EF9F27":"#E24B4A";
+      ctx.fillStyle=col+"22";ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(bx,H-10-bH,bW,bH,3);else ctx.rect(bx,H-10-bH,bW,bH);
+      ctx.fill();
+      ctx.fillStyle=col;ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(bx,H-10-bH,bW,4,2);else ctx.rect(bx,H-10-bH,bW,4);
+      ctx.fill();
+      ctx.fillStyle=col;ctx.font="bold 8px system-ui,sans-serif";ctx.textAlign="center";
+      ctx.fillText(x.s,bx+bW/2,H-12-bH);
+    });
+    document.getElementById("pwks").innerHTML=last.map(x=>{
+      const day=new Date(x.d+"T12:00:00"),it=x.d===td();
+      return `<span style="font-weight:${it?700:400};color:${it?"#0F6E56":"#B0B4C8"}">${day.toLocaleDateString("fr-FR",{weekday:"short"})}</span>`;
+    }).join("");
+  }
+
+  /* Évolution par axe */
+  const ae=document.getElementById("paxes");
+  if(h.length>=2){
+    const lat=h[h.length-1],prv=h[h.length-2];
+    ae.innerHTML=CK.map(ax=>{
+      const r=lat.a?.[ax.key]||3,rp=prv.a?.[ax.key]||3,v=6-r,p2=6-rp,diff=v-p2;
+      const tag=diff>0?`<span class="tpill tpu">↑ +${diff}</span>`:diff<0?`<span class="tpill tpd">↓ ${diff}</span>`:`<span class="tpill tpe">→ Stable</span>`;
+      const pct=Math.round(v/5*100);
+      return `<div class="aevo">
+        <span style="font-size:17px;width:22px;flex-shrink:0">${ax.ic}</span>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:13px;font-weight:700;color:#1C1C2E">${ax.lb}</span>${tag}
+          </div>
+          <div class="ebt"><div class="ebf" style="width:${pct}%;background:${ax.col}"></div></div>
+        </div>
+        <span style="font-size:18px;min-width:24px;text-align:right">${EM[r]}</span>
+      </div>`;
+    }).join("");
+  } else {
+    ae.innerHTML=`<div style="font-size:13px;color:#8A8FA8;text-align:center;padding:8px 0">Faites au moins 2 checks pour voir l'évolution par axe.</div>`;
+  }
+
+  /* Conseil */
+  const tp=document.getElementById("ptip");
+  if(h.length>=3){
+    const l5=h.slice(-5),tr=l5[l5.length-1].s-l5[0].s;
+    let cls,txt;
+    if(tr>10){cls="ok";txt="🚀 Progression remarquable sur les derniers jours. Continuez ainsi !";}
+    else if(tr<-10){cls="bad";txt="⚠️ Score en baisse. Revoyez votre protocole ou refaites un bilan complet.";}
+    else{cls="warn";txt="💡 Progression stable. Identifiez l'axe le plus problématique et ajustez.";}
+    tp.innerHTML=`<div class="fb ${cls}">${txt}</div>`;
+  } else tp.innerHTML="";
+
+  /* Réévaluation */
+  const rv=document.getElementById("preeval");
+  if(rv&&h.length>=5){
+    const l5=h.slice(-5).map(x=>x.s);
+    rv.style.display=Math.max(...l5)-Math.min(...l5)<=4?"block":"none";
+  }
+
+  /* Protocole */
+  const pp=document.getElementById("pproto");
+  if(pp){
+    const proto=ls("proto")||"Mon protocole",prio=ls("prio"),checks=h.length;
+    const progress=h.length>=2?Math.min(100,Math.max(10,Math.round(((h.slice(-3).reduce((s,x)=>s+x.s,0)/Math.min(3,h.length))-(h.slice(0,3).reduce((s,x)=>s+x.s,0)/Math.min(3,h.length)))/(h.slice(0,3).reduce((s,x)=>s+x.s,0)/Math.min(3,h.length)||1)*100+50))):35;
+    pp.innerHTML=`
+      <div class="proto-dark">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:6px">🔬 Protocole en cours</div>
+        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:9px">${proto}</div>
+        ${prio?`<div style="font-size:12px;color:rgba(255,255,255,.7);margin-bottom:4px">Objectif : améliorer <strong style="color:#7FD9A8">${prio}</strong></div>`:""}
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;height:5px;overflow:hidden;margin:10px 0 5px">
+          <div style="width:${progress}%;height:100%;border-radius:10px;background:linear-gradient(90deg,#4CAF78,#7FD9A8)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.45);margin-bottom:12px">
+          <span>${checks} check${checks>1?"s":""} enregistré${checks>1?"s":""}</span>
+          <span style="color:#7FD9A8;font-weight:700">${progress}% en progression</span>
+        </div>
+        <button onclick="go('check')" style="width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:11px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer">⚡ Faire mon check du jour</button>
+      </div>`;
+  }
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+rDash();
+updDot();
+</script>
+</body>
+</html>
